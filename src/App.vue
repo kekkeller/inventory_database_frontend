@@ -5,21 +5,23 @@ import TheWelcome from './components/TheWelcome.vue'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
+    <img alt="Vue logo" class="logo" src="./assets/db.jpg" width="125px" height="125px" />
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="Your All in One Inventory Database" />
     </div>
   </header>
 
   <main>
-    <TheWelcome />
+   <TheWelcome />
   </main>
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
+}
+.wrapper{
+  text-align: center;
 }
 
 .logo {
