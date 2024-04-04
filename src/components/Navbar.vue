@@ -7,30 +7,33 @@
           <div class="-ml-2 mr-2 flex items-center md:hidden">
           </div>
           <div class="flex-shrink-0 flex items-center">
-<!--            <ArrowDownIcon class="h-6 w-6 text-blue-500" />-->
-            <a class="text-white"> Database Inventory </a>
+            <a class="text-white text-2xl no-underline"> Database Inventory </a>
           </div>
-          <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4">
+          <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4 pl-5">
             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
             <router-link
               :to="{ name: 'Home' }"
-              class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+              class=" no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               aria-current="page"
+              active-class="active-tab"
               >Home</router-link
             >
             <router-link
                 :to="{ name: 'Renting Device' }"
-                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                class=" no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
             >Rent Device</router-link
             >
             <router-link
                 :to="{ name: 'Renting Locker' }"
-                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
             >Rent Locker</router-link
             >
             <router-link
                 :to="{ name: 'Report a Problem' }"
-                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
             >Report a Problem</router-link
             >
 
@@ -60,3 +63,10 @@ export default defineComponent({
 
 })
 </script>
+<style>
+.active-tab {
+  background-color: #4A5568;
+  color: white;
+  border-radius: 0.375rem;
+}
+</style>

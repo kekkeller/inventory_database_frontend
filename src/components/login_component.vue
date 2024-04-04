@@ -1,4 +1,10 @@
 <template>
+  <div class="justify-center">
+    <BaseLabel class="mb-10 text-4xl">
+      Welcome to the Inventory Management Database!
+    </BaseLabel>
+
+  </div>
   <div class="login-container">
     <h2>Login</h2>
     <form @submit.prevent="login">
@@ -19,9 +25,11 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import {AstronautRafiki, BaseLabel, IconAvatar} from "@apiida/vue-components";
 
 export default defineComponent({
   name: 'LoginComponent',
+  components: {BaseLabel, AstronautRafiki, IconAvatar},
   setup() {
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');

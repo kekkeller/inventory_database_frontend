@@ -1,26 +1,51 @@
 <template>
-  <div class="text-center pt-12">
-    <h1 class="text-2xl mb-8">Pick Your Device you want to rent</h1>
+  <div class="mx-auto my-10" style="width: 90%;">
+    <h3 class="text-left">Renting Device</h3>
+    <h1 class="text-2xl mb-8"></h1>
+    <b-table striped hover :items="bookings" class="w-full"></b-table>
   </div>
-  <MockupTable class="justify-center mr-20 ml-20"></MockupTable>
 </template>
 
+
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { ArrowDownIcon } from '@heroicons/vue/24/solid'
-import MockupTable from "@/components/first.vue";
-import {BaseDialog} from "@apiida/vue-components";
+import { defineComponent, ref } from 'vue'
+import {BaseLabel, BaseTable } from "@apiida/vue-components";
 
-
+interface bookings {
+  Category: string;
+  Device: string;
+  Price: string;
+  Location: string;
+}
 export default defineComponent({
   components: {
-    BaseDialog,
-    MockupTable,
-    ArrowDownIcon },
+    BaseTable,
+    BaseLabel,
+  },
   setup() {
-
+    const bookings: bookings[] = [
+      {
+        Category: 'phone',
+        Device: 'iPhone 12',
+        Price: '$19.99',
+        Location: 'building hda',
+      },
+      {
+        Category: 'laptop',
+        Device: 'MacBook Pro 16"',
+        Price: '$29.99',
+        Location: 'building centria',
+      },
+      {
+        Category: 'phone',
+        Device: 'iPhone 13 Pro',
+        Price: '$21.99',
+        Location: 'building hda',
+      }
+    ];
 
     return {
+      bookings,
     }
   },
 })

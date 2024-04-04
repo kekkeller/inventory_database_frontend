@@ -1,9 +1,6 @@
 <template>
   <div class="text-center pt-12">
-    <h1 class="text-2xl mb-8">Please Report your Problem</h1>
-    <report-problem>
-
-    </report-problem>
+    <report-problem/>
   </div>
 </template>
 
