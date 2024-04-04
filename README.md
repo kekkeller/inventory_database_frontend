@@ -4,10 +4,17 @@
 
 This projects includes multiple features out of the box including:
 
-- Metamask wallet integration: there is a "Connect Wallet" button that triggers Metamask authorization
-- State management: the metamask wallet account info is kept in a store using Pinia. That way, it can be accessed from multiple views and components.
+- Login as a User
+- See your Bookings
+- Book a Device
+- Book a Locker
+- Report a Problem
+
+  
 - TailwindCSS integration
 - Vue router
+- Pinia Store
+- bootstrap vue comp
 
 ### How I built this project step-by-step
 
