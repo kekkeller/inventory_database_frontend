@@ -9,12 +9,16 @@
       </BaseLabel>
     </div>
   </div>
+  <footer_component>
+
+  </footer_component>
 </template>
 
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import {BaseLabel, BaseTable } from "@apiida/vue-components";
+import Footer_component from "@/components/footer_component.vue";
 
 interface Rental {
   Date: string;
@@ -27,6 +31,7 @@ interface Rental {
 
 export default defineComponent({
   components: {
+    Footer_component,
     BaseTable,
     BaseLabel,
   },
