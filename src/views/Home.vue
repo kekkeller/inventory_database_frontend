@@ -1,23 +1,33 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
     <h3 class="text-left">My Bookings</h3>
-    <h1 class="text-2xl mb-8"></h1>
-    <b-table striped hover :items="rentals" class="w-full"></b-table>
+    <b-table striped hover :items="rentals" :fields="fields" class="w-full">
+      <template #cell(actions)="{ item }">
+        <b-button v-b-modal.modal-1 @click="handleClick(item)">Details</b-button>
+      </template>
+    </b-table>
+    <b-modal id="modal-1" title="Rental Details">
+      <div class="modal-content" v-if="selectedItem">
+        <p><strong>Date:</strong> {{ selectedItem.Date }}</p>
+        <p><strong>Device:</strong> {{ selectedItem.Device }}</p>
+        <p><strong>Active:</strong> {{ selectedItem.Active ? 'Yes' : 'No' }}</p>
+        <p><strong>Start Time:</strong> {{ selectedItem.StartTime }}</p>
+        <p><strong>End Time:</strong> {{ selectedItem.EndTime }}</p>
+        <p><strong>Price:</strong> {{ selectedItem.Price }}</p>
+      </div>
+    </b-modal>
     <div class="flex justify-end mt-4">
-      <BaseLabel>
-        Total spendings: {{totalPrice}}
+      <BaseLabel forId="someId">
+        Total spendings: {{ totalPrice }}
       </BaseLabel>
     </div>
   </div>
-  <footer_component>
-
-  </footer_component>
+  <footer_component></footer_component>
 </template>
 
-
 <script lang="ts">
-import { defineComponent } from 'vue'
-import {BaseLabel, BaseTable } from "@apiida/vue-components";
+import { defineComponent, ref } from 'vue';
+import { BaseLabel, BaseTable } from "@apiida/vue-components";
 import Footer_component from "@/components/footer_component.vue";
 
 interface Rental {
@@ -60,24 +70,67 @@ export default defineComponent({
         StartTime: '11:00 AM',
         EndTime: '03:00 PM',
         Price: '$21.99'
+      },
+      {
+        Date: '2024-04-06',
+        Device: 'iPad Pro',
+        Active: true,
+        StartTime: '08:00 AM',
+        EndTime: '02:00 PM',
+        Price: '$15.99'
+      },
+      {
+        Date: '2024-04-07',
+        Device: 'Samsung Galaxy S21',
+        Active: false,
+        StartTime: '12:00 PM',
+        EndTime: '06:00 PM',
+        Price: '$17.99'
       }
     ];
 
-    function calculateTotalPrice(rentals: Rental[]): string {
-      const total = rentals.reduce((total, rental) => {
-        const price = parseFloat(rental.Price.substring(1));
-        return total + price;
-      }, 0);
 
-      return `$${total.toFixed(2)}`;
+    const fields = [
+      { key: 'Date', label: 'Date' },
+      { key: 'Device', label: 'Device' },
+      { key: 'Active', label: 'Active', formatter: (value, key, item) => value ? 'Yes' : 'No' },
+      { key: 'StartTime', label: 'Start Time' },
+      { key: 'EndTime', label: 'End Time' },
+      { key: 'Price', label: 'Price' },
+      { key: 'actions', label: '', sortable: false }
+    ];
+
+    const selectedItem = ref<Rental>({
+      Date: '',
+      Device: '',
+      Active: false,
+      StartTime: '',
+      EndTime: '',
+      Price: ''
+    });
+
+    const totalPrice = ref<string>('');
+
+    function handleClick(item: Rental) {
+      console.log("Item clicked", item);  // Debugging: Log the clicked item
+      selectedItem.value = item;  // Set the clicked item as selected
+      console.log("Modal should open now.");  // Debugging statement
     }
-
-    const totalPrice = calculateTotalPrice(rentals);
 
     return {
       rentals,
+      fields,
       totalPrice,
+      selectedItem,
+      handleClick
     }
   },
 })
 </script>
+
+<style scoped>
+.modal-content {
+  max-width: 500px;
+}
+</style>
+
