@@ -3,31 +3,33 @@
     <h3 class="text-left">My Bookings</h3>
     <b-table striped hover :items="rentals" :fields="fields" class="w-full">
       <template #cell(actions)="{ item }">
-        <b-button v-b-modal.modal-1 @click="handleClick(item)">Details</b-button>
+        <b-button v-b-modal="'modal-1'" @click="handleClick(item)">Details</b-button>
       </template>
     </b-table>
-    <b-modal id="modal-1" title="Rental Details">
+    <b-modal id="modal-1" title="Rental Details" v-model="modalShow" ok-only ok-variant="secondary" ok-title="Close">
       <div class="modal-content" v-if="selectedItem">
-        <p><strong>Date:</strong> {{ selectedItem.Date }}</p>
-        <p><strong>Device:</strong> {{ selectedItem.Device }}</p>
-        <p><strong>Active:</strong> {{ selectedItem.Active ? 'Yes' : 'No' }}</p>
-        <p><strong>Start Time:</strong> {{ selectedItem.StartTime }}</p>
-        <p><strong>End Time:</strong> {{ selectedItem.EndTime }}</p>
-        <p><strong>Price:</strong> {{ selectedItem.Price }}</p>
+        <div class="ml-4 mt-2">
+          <p><strong>Date:</strong> {{ selectedItem.Date }}</p>
+          <p><strong>Device:</strong> {{ selectedItem.Device }}</p>
+          <p><strong>Active:</strong> {{ selectedItem.Active ? 'Yes' : 'No' }}</p>
+          <p><strong>Start Time:</strong> {{ selectedItem.StartTime }}</p>
+          <p><strong>End Time:</strong> {{ selectedItem.EndTime }}</p>
+          <p><strong>Price:</strong> {{ selectedItem.Price }}</p>
+        </div>
       </div>
     </b-modal>
-    <div class="flex justify-end mt-4">
+    <div class="flex justify mt-4">
       <BaseLabel forId="someId">
-        Total spendings: {{ totalPrice }}
+        Total spending's: {{ totalPrice }}
       </BaseLabel>
     </div>
   </div>
-  <footer_component></footer_component>
+<!--  <footer_component></footer_component>-->
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { BaseLabel, BaseTable } from "@apiida/vue-components";
+import { BaseLabel } from "@apiida/vue-components";
 import Footer_component from "@/components/footer_component.vue";
 
 interface Rental {
@@ -41,9 +43,8 @@ interface Rental {
 
 export default defineComponent({
   components: {
-    Footer_component,
-    BaseTable,
     BaseLabel,
+    Footer_component,
   },
   setup() {
     const rentals: Rental[] = [
@@ -89,11 +90,12 @@ export default defineComponent({
       }
     ];
 
+    const modalShow = ref(false);
 
     const fields = [
       { key: 'Date', label: 'Date' },
       { key: 'Device', label: 'Device' },
-      { key: 'Active', label: 'Active', formatter: (value, key, item) => value ? 'Yes' : 'No' },
+      { key: 'Active', label: 'Active', formatter: (value) => value ? 'Yes' : 'No' },
       { key: 'StartTime', label: 'Start Time' },
       { key: 'EndTime', label: 'End Time' },
       { key: 'Price', label: 'Price' },
@@ -112,17 +114,28 @@ export default defineComponent({
     const totalPrice = ref<string>('');
 
     function handleClick(item: Rental) {
-      console.log("Item clicked", item);  // Debugging: Log the clicked item
-      selectedItem.value = item;  // Set the clicked item as selected
-      console.log("Modal should open now.");  // Debugging statement
+      modalShow.value = true;
+      selectedItem.value = item;
     }
+    function calculateTotalPrice() {
+      let total = 0;
+      rentals.forEach((rental) => {
+        if (rental) {
+          const price = parseFloat(rental.Price.substring(1));
+          total += price;
+        }
+      });
+      totalPrice.value = `$${total.toFixed(2)}`;
+    }
+    calculateTotalPrice();
 
     return {
       rentals,
       fields,
       totalPrice,
       selectedItem,
-      handleClick
+      handleClick,
+      modalShow,
     }
   },
 })
