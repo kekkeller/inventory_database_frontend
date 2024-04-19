@@ -1,37 +1,17 @@
 <template>
   <div class="report-container">
     <h2>Report a Problem</h2>
-    <form @submit.prevent="submitReport">
-      <div class="form-row">
-        <div class="form-group half-width">
-          <label for="name">Your Name:</label>
-          <input type="text" id="name" v-model="report.name" required>
-        </div>
-        <div class="form-group half-width">
-          <label for="email">Your Email:</label>
-          <input type="email" id="email" v-model="report.email" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="categories">Category:</label>
-        <select id="categories" v-model="report.category" required>
-          <option disabled value="">Please select one</option>
-          <option>Hardware Issue</option>
-          <option>Software Issue</option>
-          <option>Network Problem</option>
-          <option>Other</option>
-        </select>
-      </div>
+    <form @submit.prevent="submitReport" class="form-container">
       <div class="form-group">
         <label for="description">Problem Description:</label>
         <textarea id="description" v-model="report.description" rows="4" required></textarea>
       </div>
       <div class="form-group">
         <label for="file">Upload File:</label>
-        <input type="file" id="file" @change="handleFileUpload">
-        <button type="button" class="mt-2" @click="saveFile">Save File</button>
+        <input type="file" id="file" @change="handleFileUpload" required>
+        <button type="button" class="btn-file-upload" @click="saveFile">Save File</button>
       </div>
-      <button type="submit">Submit Report</button>
+      <button type="submit" class="submit-btn">Submit Report</button>
     </form>
   </div>
 </template>
@@ -43,23 +23,30 @@ export default defineComponent({
   name: 'ReportProblem',
   setup() {
     const report = ref({
-      name: '',
-      email: '',
-      category: '',
       description: '',
+      name: 'User 1',
+      email: 'email123',
+      file: null
     });
 
-    const handleFileUpload = (event: Event) => {
-      console.log('File selected:');
+    const handleFileUpload = event => {
+      report.value.file = event.target.files[0];  // store the file in the report object
+      if (report.value.file) {
+        console.log('File selected:', report.value.file.name);
+      }
     };
 
     const saveFile = () => {
-      console.log('File "saved"');
+      console.log('File "saved"', report.value.file);  // Log the saved file, here you might implement actual file saving logic
     };
 
     const submitReport = () => {
+      if (!report.value.description || !report.value.file) {
+        console.log('Description or file is missing!');
+        return;
+      }
       console.log('Report submitted:', report.value);
-      report.value = { name: '', email: '', category: '', description: '' };
+      report.value = { description: '', file: null }; // Reset the form after submission
     };
 
     return { report, submitReport, handleFileUpload, saveFile };
@@ -67,26 +54,70 @@ export default defineComponent({
 });
 </script>
 
+<!--<script lang="ts">-->
+<!--import { defineComponent, ref } from 'vue';-->
+<!--import axios from 'axios'; // Stelle sicher, dass axios importiert wird-->
+
+<!--export default defineComponent({-->
+<!--  name: 'ReportProblem',-->
+<!--  setup() {-->
+<!--    const report = ref({-->
+<!--      description: '',-->
+<!--      file: null-->
+<!--    });-->
+
+<!--    const handleFileUpload = event => {-->
+<!--      report.value.file = event.target.files[0];-->
+<!--      if (report.value.file) {-->
+<!--        console.log('File selected:', report.value.file.name);-->
+<!--      }-->
+<!--    };-->
+
+<!--    const submitReport = async () => {-->
+<!--      if (!report.value.description || !report.value.file) {-->
+<!--        console.log('Description or file is missing!');-->
+<!--        return;-->
+<!--      }-->
+
+<!--      const formData = new FormData();-->
+<!--      formData.append('description', report.value.description);-->
+<!--      formData.append('file', report.value.file);-->
+
+<!--      try {-->
+<!--        const response = await axios.post('http://your-backend-url.com/api/report', formData, {-->
+<!--          headers: {-->
+<!--            'Content-Type': 'multipart/form-data'-->
+<!--          }-->
+<!--        });-->
+<!--        console.log('Response:', response.data);-->
+<!--        report.value = { description: '', file: null }; // Reset the form after submission-->
+<!--      } catch (error) {-->
+<!--        console.error('Error submitting report:', error);-->
+<!--      }-->
+<!--    };-->
+
+<!--    return { report, submitReport, handleFileUpload };-->
+<!--  },-->
+<!--});-->
+<!--</script>-->
+
 <style>
 .report-container {
-  max-width: 70%;
-  margin: auto;
+  max-width: 500px;
+  margin: 40px auto;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.form-row {
+.form-container {
   display: flex;
-  justify-content: space-between;
-}
-
-.half-width {
-  width: 48%; /* Adjusts for margin/padding */
+  flex-direction: column;
+  align-items: center;
 }
 
 .form-group {
+  width: 100%; /* Full width */
   margin-bottom: 20px;
-  margin-top: 10px;
 }
 
 .form-group label {
@@ -94,25 +125,39 @@ export default defineComponent({
   margin-bottom: 5px;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
+.form-group input[type="file"],
+.form-group textarea {
+  width: 100%; /* Ensures the input and textarea are full width */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-button[type="submit"], button[type="button"] {
+.btn-file-upload {
   background-color: #9ba5af;
   color: white;
   padding: 10px 15px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: 10px;
 }
 
-button[type="submit"]:hover, button[type="button"]:hover {
+.btn-file-upload:hover {
   background-color: #509a21;
+}
+
+.submit-btn {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px; /* Added margin for spacing */
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
 }
 </style>
