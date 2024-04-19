@@ -1,9 +1,9 @@
 <template>
-  <div class="justify-center">
-    <BaseLabel class="mb-10 text-4xl">
+  <div class="d-flex flex-column align-items-center text-center">
+    <img src="src/assets/logo.png" alt="Icon" class="h-32 w-auto">
+    <BaseLabel class="mb-10 text-3xl xl:text-5xl">
       Welcome to the Inventory Management Database!
     </BaseLabel>
-
   </div>
   <div class="login-container">
     <h2>Login</h2>
@@ -24,32 +24,41 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import axios from 'axios'; // Import axios for making HTTP requests
 import { useRouter } from 'vue-router';
-import {AstronautRafiki, BaseLabel, IconAvatar} from "@apiida/vue-components";
+import { BaseLabel } from "@apiida/vue-components";
 
 export default defineComponent({
   name: 'LoginComponent',
-  components: {BaseLabel, AstronautRafiki, IconAvatar},
+  components: { BaseLabel },
   setup() {
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
     const router = useRouter();
+    const apiUrl = 'https://run.mocky.io/v3/c272bcdf-815e-4312-85f6-ea7630d0cbfd';  // Change this URL to our actual API endpoint
 
-    const login = () => {
+    const login = async () => {
       errorMessage.value = ''; // Reset the error message on each login attempt
+      if (!credentials.value.email || !credentials.value.password) {
+        errorMessage.value = 'Both email and password are required.';
+        return;
+      }
 
-      if (credentials.value.email && credentials.value.password) {
-        // Assuming login is successful
-        console.log('Login successful with:', credentials.value);
+      try {
+        const response = await axios.post(apiUrl, {
+          email: credentials.value.email,
+          password: credentials.value.password
+        });
 
-        // Set isAuthenticated flag in sessionStorage
-        sessionStorage.setItem('isAuthenticated', 'true');
-
-        // Navigate to the home page
-        router.push('/');
-      } else {
-        // If validation fails, set an error message
-        errorMessage.value = 'Login failed. Please check your credentials.';
+        if (response.data.success) {
+          console.log('Login successful with:', credentials.value);
+          sessionStorage.setItem('isAuthenticated', 'true');
+          router.push('/');
+        } else {
+          throw new Error('Login failed. Please check your credentials.');
+        }
+      } catch (error) {
+        errorMessage.value = error.message || 'An unexpected error occurred.';
       }
     };
 
