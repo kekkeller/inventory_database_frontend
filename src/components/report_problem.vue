@@ -81,7 +81,7 @@ export default defineComponent({
 </script>
 
 <style>
-/* Your existing styles */
+
 .report-container {
   max-width: 500px;
   margin: 40px auto;

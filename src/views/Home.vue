@@ -24,7 +24,7 @@
       </BaseLabel>
     </div>
   </div>
-<!--  <footer_component></footer_component>-->
+  <footer_component></footer_component>
 </template>
 
 <script lang="ts">
