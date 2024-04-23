@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column align-items-center text-center">
-    <img src="src/assets/logo.png" alt="Icon" class="h-32 w-auto">
+    <img :src="logoImageUrl" alt="Icon" class="h-32 w-auto">
     <BaseLabel class="mb-10 text-3xl xl:text-5xl">
       Welcome to the Inventory Management Database!
     </BaseLabel>
@@ -32,6 +32,7 @@ export default defineComponent({
   name: 'LoginComponent',
   components: { BaseLabel },
   setup() {
+    const logoImageUrl = new URL('../assets/logo.png', import.meta.url).href;
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
     const router = useRouter();
@@ -62,7 +63,7 @@ export default defineComponent({
       }
     };
 
-    return { credentials, login, errorMessage };
+    return { credentials, login, errorMessage, logoImageUrl };
   }
 });
 </script>

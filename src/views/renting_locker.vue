@@ -27,7 +27,7 @@
         </div>
         <div v-else>
           <p>Your booking pin: {{ bookingPin }}</p>
-          <b-img src="src/assets/map.JPG"></b-img>
+          <b-img :src="mapImageUrl"></b-img>
           <b-button variant="primary" class="mt-2" @click="closeModal">Okay</b-button>
         </div>
       </template>
@@ -46,6 +46,7 @@ interface Locker {
 
 export default defineComponent({
   setup() {
+    const mapImageUrl = new URL('../assets/map.JPG', import.meta.url).href;
     const lockers = ref<Locker[]>([
       {
         Name: 'Locker 1',
@@ -104,7 +105,8 @@ export default defineComponent({
       closeModal,
       confirmBooking,
       bookingConfirmed,
-      bookingPin
+      bookingPin,
+      mapImageUrl
     };
   },
 });
