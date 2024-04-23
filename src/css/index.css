@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.active-tab {
+    background-color: #4A5568;
+    color: white;
+    border-radius: 0.375rem;
+}

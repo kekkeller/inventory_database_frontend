@@ -52,14 +52,6 @@ const logout = () => {
   border-radius: 0.375rem; /* Rundungen hinzufügen */
   cursor: pointer; /* Cursor als Zeiger, um die Interaktivität anzuzeigen */
   transition: background-color 0.3s; /* Glatter Übergang für Hover-Effekt */
-  &:hover {
-    background-color: #c30000; /* Dunklerer Rot-Ton beim Hover */
-  }
 }
 
-.active-tab {
-  background-color: #4A5568;
-  color: white;
-  border-radius: 0.375rem;
-}
 </style>

@@ -64,7 +64,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
 .logout-btn {
   margin-left: 20px; /* Abstand von anderen Elementen */
   background-color: #f00; /* Rote Farbe für den Logout-Button */
@@ -73,8 +72,5 @@ export default defineComponent({
   border-radius: 0.375rem; /* Rundungen hinzufügen */
   cursor: pointer; /* Cursor als Zeiger, um die Interaktivität anzuzeigen */
   transition: background-color 0.3s; /* Glatter Übergang für Hover-Effekt */
-  &:hover {
-    background-color: #c30000; /* Dunklerer Rot-Ton beim Hover */
-  }
 }
 </style>
