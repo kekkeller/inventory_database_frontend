@@ -1,20 +1,24 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, computed } from 'vue'
 import NavBar from '@/components/NavBar.vue'
+import AdminNavBar from '@/components/AdminNavBar.vue'
 import Footer from '@/components/Footer.vue'
 
 export default defineComponent({
   setup() {
-    return {}
+    const isAdmin = computed(() => sessionStorage.getItem('isAdmin') === 'true');
+
+    return { isAdmin };
   },
-  components: { NavBar, Footer },
+  components: { NavBar, AdminNavBar, Footer },
 })
 </script>
 
 <template>
   <div id="app">
-    <!-- Conditionally render navbar if not on login page -->
-    <NavBar v-if="$route.name !== 'Login'" />
+    <!-- Bedingte Anzeige der NavBars basierend auf der Rolle -->
+    <AdminNavBar v-if="isAdmin" />
+    <NavBar v-else-if="$route.name !== 'Login'" />
     <router-view/>
   </div>
 </template>

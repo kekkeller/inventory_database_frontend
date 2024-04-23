@@ -24,7 +24,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import axios from 'axios'; // Import axios for making HTTP requests
 import { useRouter } from 'vue-router';
 import { BaseLabel } from "@apiida/vue-components";
 
@@ -36,30 +35,24 @@ export default defineComponent({
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
     const router = useRouter();
-    const apiUrl = 'https://run.mocky.io/v3/c272bcdf-815e-4312-85f6-ea7630d0cbfd';  // Change this URL to our actual API endpoint
+
+    // Statische Benutzerdaten
+    const users = [
+      { email: 'admin@admin.com', password: '123', isAdmin: true },
+      { email: 'user@user.com', password: '123', isAdmin: false }
+    ];
 
     const login = async () => {
-      errorMessage.value = ''; // Reset the error message on each login attempt
-      if (!credentials.value.email || !credentials.value.password) {
-        errorMessage.value = 'Both email and password are required.';
-        return;
-      }
-
-      try {
-        const response = await axios.post(apiUrl, {
-          email: credentials.value.email,
-          password: credentials.value.password
-        });
-
-        if (response.data.success) {
-          console.log('Login successful with:', credentials.value);
-          sessionStorage.setItem('isAuthenticated', 'true');
-          router.push('/');
-        } else {
-          throw new Error('Login failed. Please check your credentials.');
-        }
-      } catch (error) {
-        errorMessage.value = error.message || 'An unexpected error occurred.';
+      errorMessage.value = '';
+      // Benutzerdaten überprüfen
+      const user = users.find(u => u.email === credentials.value.email && u.password === credentials.value.password);
+      if (user) {
+        sessionStorage.setItem('isAuthenticated', 'true');
+        sessionStorage.setItem('isAdmin', user.isAdmin.toString());
+        const destinationRoute = user.isAdmin ? '/adminDashboard' : '/';
+        await router.push(destinationRoute);
+      } else {
+        errorMessage.value = 'Login failed. Please check your credentials.';
       }
     };
 
