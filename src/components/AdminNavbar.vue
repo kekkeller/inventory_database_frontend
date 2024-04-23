@@ -28,19 +28,25 @@
   </nav>
 </template>
 
-<script setup>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import {useLoggedIn} from "@/composable/useLoggedIn";
 
-const router = useRouter();
+export default defineComponent({
+  setup() {
+    const router = useRouter();
+    const {setLoggedIn} = useLoggedIn();
 
-const logout = () => {
-  // Session-Daten löschen
-  sessionStorage.removeItem('isAuthenticated');
-  sessionStorage.removeItem('isAdmin');
-
-  // Umleitung zum Login-Screen
-  router.push('/login');
-};
+    function logout() {
+      // Session-Daten löschen
+      setLoggedIn('None');
+      // Umleitung zum Login-Screen
+      router.push('/login');
+    }
+    return { logout };
+  }
+});
 </script>
 
 <style scoped>

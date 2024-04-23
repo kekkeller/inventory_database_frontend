@@ -44,16 +44,16 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
+import {useLoggedIn} from "@/composable/useLoggedIn";
 
 export default defineComponent({
   setup() {
     const router = useRouter();
+    const {setLoggedIn} = useLoggedIn();
 
     function logout() {
       // Session-Daten löschen
-      sessionStorage.removeItem('isAuthenticated');
-      sessionStorage.removeItem('isAdmin');
-
+      setLoggedIn('None');
       // Umleitung zum Login-Screen
       router.push('/login');
     }

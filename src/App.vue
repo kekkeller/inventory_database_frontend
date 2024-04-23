@@ -3,12 +3,16 @@ import { defineComponent, computed } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import AdminNavBar from '@/components/AdminNavBar.vue'
 import Footer from '@/components/Footer.vue'
+import { useLoggedIn } from "./composable/useLoggedIn";
+
 
 export default defineComponent({
   setup() {
     const isAdmin = computed(() => sessionStorage.getItem('isAdmin') === 'true');
 
-    return { isAdmin };
+    const {loggedIn} = useLoggedIn();
+
+    return { isAdmin, loggedIn };
   },
   components: { NavBar, AdminNavBar, Footer },
 })
@@ -16,9 +20,8 @@ export default defineComponent({
 
 <template>
   <div id="app">
-    <!-- Bedingte Anzeige der NavBars basierend auf der Rolle -->
-    <AdminNavBar v-if="isAdmin" />
-    <NavBar v-else-if="$route.name !== 'Login'" />
+    <AdminNavBar v-if="loggedIn == 'Admin'" />
+    <NavBar v-else-if="loggedIn != 'None'" />
     <router-view/>
   </div>
 </template>

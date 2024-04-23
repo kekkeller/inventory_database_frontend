@@ -26,6 +26,7 @@
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { BaseLabel } from "@apiida/vue-components";
+import {useLoggedIn} from "../composable/useLoggedIn";
 
 export default defineComponent({
   name: 'LoginComponent',
@@ -35,6 +36,7 @@ export default defineComponent({
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
     const router = useRouter();
+    const {setLoggedIn} = useLoggedIn();
 
     // Statische Benutzerdaten
     const users = [
@@ -48,7 +50,7 @@ export default defineComponent({
       const user = users.find(u => u.email === credentials.value.email && u.password === credentials.value.password);
       if (user) {
         sessionStorage.setItem('isAuthenticated', 'true');
-        sessionStorage.setItem('isAdmin', user.isAdmin.toString());
+        setLoggedIn(user.isAdmin ? 'Admin' : 'User');
         const destinationRoute = user.isAdmin ? '/adminDashboard' : '/';
         await router.push(destinationRoute);
       } else {
