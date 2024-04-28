@@ -7,18 +7,40 @@
           <div class="flex-shrink-0 flex items-center">
             <a class="text-white text-2xl no-underline">Admin Panel - Database Inventory</a>
           </div>
-          <!-- Links speziell für Admins -->
           <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4 pl-5">
             <router-link
                 :to="{ name: 'AdminDashboard' }"
                 class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                 active-class="active-tab"
             >Dashboard</router-link>
-            <!-- Weitere Admin-spezifische Links können hier eingefügt werden -->
+            <router-link
+                :to="{ name: 'Categories' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >Categories</router-link>
+            <router-link
+                :to="{ name: 'Devices' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >Devices</router-link>
+            <router-link
+                :to="{ name: 'Bookings' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >Bookings</router-link>
+            <router-link
+                :to="{ name: 'User' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >User</router-link>
+            <router-link
+                :to="{ name: 'Problem Reports' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >Problem Reports</router-link>
           </div>
         </div>
         <div class="flex items-center">
-          <!-- Logout Button rechts ausrichten mit der logout-btn Klasse -->
           <button @click="logout" class="logout-btn">
             Logout
           </button>
