@@ -1,18 +1,20 @@
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, onMounted } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import AdminNavBar from '@/components/AdminNavBar.vue'
 import Footer from '@/components/Footer.vue'
 import { useLoggedIn } from "./composable/useLoggedIn";
 
-
 export default defineComponent({
   setup() {
-    const isAdmin = computed(() => sessionStorage.getItem('isAdmin') === 'true');
+    const { loggedIn, checkLoggedIn } = useLoggedIn();
 
-    const {loggedIn} = useLoggedIn();
+    // Überprüfen des loggedIn Status beim Starten der App
+    onMounted(() => {
+      checkLoggedIn();
+    });
 
-    return { isAdmin, loggedIn };
+    return { loggedIn };
   },
   components: { NavBar, AdminNavBar, Footer },
 })
@@ -20,17 +22,9 @@ export default defineComponent({
 
 <template>
   <div id="app">
-    <AdminNavBar v-if="loggedIn == 'Admin'" />
-    <NavBar v-else-if="loggedIn == 'User'" />
+    <!-- Verwendung von .value, um den aktuellen Wert der Ref zu überprüfen -->
+    <AdminNavBar v-if="loggedIn === 'Admin'" />
+    <NavBar v-else-if="loggedIn === 'User'" />
     <router-view/>
   </div>
 </template>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-</style>

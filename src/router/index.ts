@@ -32,17 +32,19 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
-  const isAuthenticated = sessionStorage.getItem('isAuthenticated'); // Or however you handle auth
-  const isAdmin = sessionStorage.getItem('isAdmin') === 'true'; // Admin status
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated'); // Überprüfe, wie dieser Wert gesetzt wird.
+  const isAdmin = sessionStorage.getItem('isAdmin') === 'true'; // Admin Status
+
+  console.log('Auth:', isAuthenticated, 'Admin:', isAdmin); // Logging zur Diagnose
 
   if (requiresAuth && !isAuthenticated) {
     next('/login');
   } else if (requiresAuth && requiresAdmin && !isAdmin) {
-    // Redirect non-admin users trying to access admin-only pages
     next('/');
   } else {
     next();
   }
 });
+
 
 export default router;
