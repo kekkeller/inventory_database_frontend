@@ -5,7 +5,7 @@
     <div class="flex justify mt-4">
     </div>
   </div>
-  <footer_component></footer_component>
+<!--  <footer_component></footer_component>-->
 </template>
 
 <script lang="ts">

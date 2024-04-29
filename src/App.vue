@@ -21,7 +21,7 @@ export default defineComponent({
 <template>
   <div id="app">
     <AdminNavBar v-if="loggedIn == 'Admin'" />
-    <NavBar v-else-if="loggedIn != 'None'" />
+    <NavBar v-else-if="loggedIn == 'User'" />
     <router-view/>
   </div>
 </template>
