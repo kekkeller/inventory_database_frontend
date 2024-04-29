@@ -6,7 +6,7 @@
         <b-button variant="primary" @click="editCategory(data.item)">Edit</b-button>
       </template>
       <template #cell(delete)="data">
-        <b-button variant="danger" @click="deleteCategory(data.item.id)">Delete</b-button>
+        <b-button variant="danger" @click="confirmDelete(data.item.id)">Delete</b-button>
       </template>
     </b-table>
 
@@ -14,9 +14,20 @@
     <b-modal id="edit-modal" v-model="isEditModalVisible" title="Edit Category" @ok="saveCategory">
       <b-form-input v-if="editableCategory" v-model="editableCategory.name" placeholder="Enter category name"></b-form-input>
     </b-modal>
+
+    <!-- Confirmation Modal for deleting categories -->
+    <b-modal id="delete-modal"
+             v-model="isDeleteModalVisible"
+             title="Confirm Delete"
+             @ok="deleteCategory"
+             ok-title="Yes"
+             ok-variant="danger">
+      Are you sure you want to delete this category?
+    </b-modal>
   </div>
   <footer_component></footer_component>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
@@ -36,8 +47,6 @@ export default defineComponent({
       { id: 3, name: "Clothing" }
     ]);
 
-
-
     const fields = [
       { key: 'id', label: 'ID' },
       { key: 'name', label: 'Name' },
@@ -46,25 +55,25 @@ export default defineComponent({
     ];
 
     const isEditModalVisible = ref(false);
-    const editableCategory = ref<Category | null>(null); // Initialize to null and set only on edit
+    const isDeleteModalVisible = ref(false);
+    const editableCategory = ref<Category | null>(null);
+    const deletingCategoryId = ref<number | null>(null);
 
     const editCategory = (category: Category) => {
-      editableCategory.value = { ...category }; // Clone the object to avoid direct mutation
+      editableCategory.value = { ...category };
       isEditModalVisible.value = true;
     };
 
-    const saveCategory = () => {
-      if (editableCategory.value) {
-        // Update the category in the array
-        const index = categories.value.findIndex(c => c.id === editableCategory.value.id);
-        categories.value[index].name = editableCategory.value.name;
-        isEditModalVisible.value = false;
-      }
+    const confirmDelete = (id: number) => {
+      deletingCategoryId.value = id;
+      isDeleteModalVisible.value = true;
     };
 
-    const deleteCategory = (id: number) => {
-      // Filter out the category by ID to delete
-      categories.value = categories.value.filter(c => c.id !== id);
+    const deleteCategory = () => {
+      if (deletingCategoryId.value !== null) {
+        categories.value = categories.value.filter(c => c.id !== deletingCategoryId.value);
+        isDeleteModalVisible.value = false;
+      }
     };
 
     return {
@@ -72,10 +81,13 @@ export default defineComponent({
       fields,
       editCategory,
       deleteCategory,
+      confirmDelete,
       isEditModalVisible,
+      isDeleteModalVisible,
       editableCategory,
-      saveCategory
+      deletingCategoryId
     }
   },
 })
 </script>
+
