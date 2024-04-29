@@ -12,7 +12,11 @@
 
     <!-- Modal for editing categories -->
     <b-modal id="edit-modal" v-model="isEditModalVisible" title="Edit Category" @ok="saveCategory">
-      <b-form-input v-if="editableCategory" v-model="editableCategory.name" placeholder="Enter category name"></b-form-input>
+      <b-form-input
+          v-if="editableCategory"
+          v-model="editableCategory.name"
+          placeholder="Enter category name">
+      </b-form-input>
     </b-modal>
 
     <!-- Confirmation Modal for deleting categories -->
@@ -27,7 +31,6 @@
   </div>
   <footer_component></footer_component>
 </template>
-
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
@@ -64,6 +67,16 @@ export default defineComponent({
       isEditModalVisible.value = true;
     };
 
+    const saveCategory = () => {
+      if (editableCategory.value) {
+        const index = categories.value.findIndex(c => c.id === editableCategory.value.id);
+        if (index !== -1) {
+          categories.value[index] = { ...editableCategory.value };
+          isEditModalVisible.value = false;
+        }
+      }
+    };
+
     const confirmDelete = (id: number) => {
       deletingCategoryId.value = id;
       isDeleteModalVisible.value = true;
@@ -80,8 +93,9 @@ export default defineComponent({
       categories,
       fields,
       editCategory,
-      deleteCategory,
+      saveCategory,
       confirmDelete,
+      deleteCategory,
       isEditModalVisible,
       isDeleteModalVisible,
       editableCategory,
@@ -90,4 +104,3 @@ export default defineComponent({
   },
 })
 </script>
-
