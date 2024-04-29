@@ -9,7 +9,6 @@
         <b-button variant="danger" @click="confirmDelete(data.item.id)">Delete</b-button>
       </template>
     </b-table>
-
     <!-- Modal for editing categories -->
     <b-modal id="edit-modal" v-model="isEditModalVisible" title="Edit Category" @ok="saveCategory">
       <b-form-input
@@ -33,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import {defineComponent, ref} from 'vue';
 import Footer_component from "@/components/footer_component.vue";
 
 interface Category {
@@ -42,19 +41,19 @@ interface Category {
 }
 
 export default defineComponent({
-  components: { Footer_component },
+  components: {Footer_component},
   setup() {
     const categories = ref<Category[]>([
-      { id: 1, name: "Electronics" },
-      { id: 2, name: "Furniture" },
-      { id: 3, name: "Clothing" }
+      {id: 1, name: "Electronics"},
+      {id: 2, name: "Furniture"},
+      {id: 3, name: "Clothing"}
     ]);
 
     const fields = [
-      { key: 'id', label: 'ID' },
-      { key: 'name', label: 'Name' },
-      { key: 'edit', label: 'Edit', sortable: false },
-      { key: 'delete', label: 'Delete', sortable: false }
+      {key: 'id', label: 'ID'},
+      {key: 'name', label: 'Name'},
+      {key: 'edit', label: 'Edit', sortable: false},
+      {key: 'delete', label: 'Delete', sortable: false}
     ];
 
     const isEditModalVisible = ref(false);
@@ -63,7 +62,7 @@ export default defineComponent({
     const deletingCategoryId = ref<number | null>(null);
 
     const editCategory = (category: Category) => {
-      editableCategory.value = { ...category };
+      editableCategory.value = {...category};
       isEditModalVisible.value = true;
     };
 
@@ -71,7 +70,7 @@ export default defineComponent({
       if (editableCategory.value) {
         const index = categories.value.findIndex(c => c.id === editableCategory.value.id);
         if (index !== -1) {
-          categories.value[index] = { ...editableCategory.value };
+          categories.value[index] = {...editableCategory.value};
           isEditModalVisible.value = false;
         }
       }
