@@ -24,6 +24,7 @@
       <b-form-input v-model="editableDevice.qrCode" placeholder="QR Code"></b-form-input>
     </b-modal>
 
+
     <!-- Confirmation Modal for deleting devices -->
     <b-modal id="delete-modal"
              v-model="isDeleteModalVisible"
