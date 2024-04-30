@@ -25,6 +25,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios'; // Import axios
 import { BaseLabel } from "@apiida/vue-components";
 import {useLoggedIn} from "../composable/useLoggedIn";
 
@@ -32,33 +33,45 @@ export default defineComponent({
   name: 'LoginComponent',
   components: { BaseLabel },
   setup() {
+    const router = useRouter();
     const logoImageUrl = new URL('../assets/logo.png', import.meta.url).href;
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
-    const router = useRouter();
     const {setLoggedIn} = useLoggedIn();
-
-    // Statische Benutzerdaten
-    const users = [
-      { email: 'admin@admin.com', password: '123', isAdmin: true },
-      { email: 'user@user.com', password: '123', isAdmin: false }
-    ];
 
     const login = async () => {
       errorMessage.value = '';
-      // Benutzerdaten überprüfen
-      const user = users.find(u => u.email === credentials.value.email && u.password === credentials.value.password);
-      if (user) {
-        sessionStorage.setItem('isAuthenticated', 'true');
-        setLoggedIn(user.isAdmin ? 'Admin' : 'User');
-        const destinationRoute = user.isAdmin ? '/adminDashboard' : '/';
-        await router.push(destinationRoute);
-      } else {
+      try {
+        // Verwende URLSearchParams, um die Parameter sicher zu kodieren
+        const params = new URLSearchParams();
+        params.append('email', credentials.value.email);
+        params.append('password', credentials.value.password);
+
+        const response = await axios.post('/api/loginIsValid?' + params.toString());
+
+        // Hier folgt die Logik basierend auf der Antwort
+        if (response.data && response.data.role) {
+          const role = response.data.role === 'admin' ? 'Admin' : 'User';
+          sessionStorage.setItem('isAuthenticated', 'true');
+          sessionStorage.setItem('isAdmin', role === 'Admin' ? 'true' : 'false');
+          setLoggedIn(role);
+          const destinationRoute = role === 'Admin' ? '/adminDashboard' : '/';
+          await router.push(destinationRoute);
+        } else {
+          errorMessage.value = 'Login failed. Please check your credentials.';
+        }
+      } catch (error) {
+        console.error('Login request failed:', error);
         errorMessage.value = 'Login failed. Please check your credentials.';
       }
     };
 
-    return { credentials, login, errorMessage, logoImageUrl };
+    return {
+      logoImageUrl,
+      credentials,
+      errorMessage,
+      login
+    };
   }
 });
 </script>
