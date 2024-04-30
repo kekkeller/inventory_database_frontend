@@ -53,13 +53,14 @@ const chartOptions = {
   }
 };
 </script>
-
 <style>
 .chart-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Geändert von column zu row */
   justify-content: center;
   align-items: center;
   gap: 20px;
+  width: 100%; /* Stelle sicher, dass der Container die volle Breite einnimmt */
+  height: 400px; /* Definiere eine feste Höhe für den Container */
 }
 </style>
