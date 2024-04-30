@@ -28,13 +28,12 @@
       Are you sure you want to delete this category?
     </b-modal>
   </div>
-  <footer_component></footer_component>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
-import Footer_component from "@/components/footer_component.vue";
+
 
 interface Category {
   id: number;
@@ -42,7 +41,7 @@ interface Category {
 }
 
 export default defineComponent({
-  components: { Footer_component },
+  components: {  },
   setup() {
     const categories = ref<Category[]>([]);
     const fields = [
