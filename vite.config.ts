@@ -5,6 +5,15 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://f-itplfo6nya-uc.a.run.app',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      }
+    }
+    },
   build: {
     chunkSizeWarningLimit: 1200,
   },

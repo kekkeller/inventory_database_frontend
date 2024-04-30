@@ -9,7 +9,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
 
 
+
 const app = createApp(App)
+
+app.config.globalProperties.backendLink = 'https://f-itplfo6nya-uc.a.run.app'
 app.use(BootstrapVue3);
 app.use(router)
 app.use(createPinia())
