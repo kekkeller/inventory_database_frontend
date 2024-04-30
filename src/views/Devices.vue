@@ -12,18 +12,17 @@
 
     <!-- Modal for editing device details -->
     <b-modal id="edit-modal" v-model="isEditModalVisible" title="Edit Device" @ok="saveDevice">
-      <b-form-input v-model="editableDevice.owner" placeholder="Owner"></b-form-input>
-      <b-form-input v-model="editableDevice.purchaseDate" placeholder="Purchase Date" type="date"></b-form-input>
-      <b-form-input v-model="editableDevice.price" placeholder="Price"></b-form-input>
+      <b-form-input v-model="editableDevice.owner" placeholder="Owner" required></b-form-input>
+      <b-form-input v-model="editableDevice.date_of_purchase" placeholder="Purchase Date" type="date" required></b-form-input>
+      <b-form-input v-model="editableDevice.price" placeholder="Price" type="number" required></b-form-input>
       <b-form-checkbox v-model="editableDevice.active">Active</b-form-checkbox>
-      <b-form-textarea v-model="editableDevice.info" placeholder="Info"></b-form-textarea>
-      <b-form-input v-model="editableDevice.brand" placeholder="Brand"></b-form-input>
-      <b-form-input v-model="editableDevice.model" placeholder="Model"></b-form-input>
-      <b-form-input v-model="editableDevice.image" placeholder="Image URL"></b-form-input>
-      <b-form-input v-model="editableDevice.serialNumber" placeholder="Serial Number"></b-form-input>
-      <b-form-input v-model="editableDevice.qrCode" placeholder="QR Code"></b-form-input>
+      <b-form-input v-model="editableDevice.description" placeholder="Description" required></b-form-input>
+      <b-form-input v-model="editableDevice.brand" placeholder="Brand" required></b-form-input>
+      <b-form-input v-model="editableDevice.model" placeholder="Model" required></b-form-input>
+      <b-form-input v-model="editableDevice.serial_no" placeholder="Serial Number" required></b-form-input>
+      <b-form-input v-model="editableDevice.qr_code" placeholder="QR Code" required></b-form-input>
+      <b-form-input v-model="editableDevice.category_id" placeholder="Category ID" required></b-form-input>
     </b-modal>
-
 
     <!-- Confirmation Modal for deleting devices -->
     <b-modal id="delete-modal"
@@ -35,96 +34,117 @@
       Are you sure you want to delete this device?
     </b-modal>
   </div>
-  <footer_component></footer_component>
 </template>
 
-
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import Footer_component from "@/components/footer_component.vue";
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
 
 interface Device {
   id: number;
   owner: string;
-  purchaseDate: string;
-  price: string;
+  date_of_purchase: string;
+  price: number;
   active: boolean;
-  info: string;
+  description: string;
   brand: string;
   model: string;
-  image: string;
-  serialNumber: string;
-  qrCode: string;
+  serial_no: string;
+  qr_code: string;
+  category_id: number;
 }
 
 export default defineComponent({
-  components: { Footer_component },
+  components: {},
   setup() {
-    const devices = ref<Device[]>([
-      // Beispiel-Daten für Devices
-      { id: 1, owner: "John Doe", purchaseDate: "2021-04-22", price: "1200", active: true, info: "New model, fast processing", brand: "Dell", model: "XPS 15", image: "url", serialNumber: "SN123456", qrCode: "QR123456" },
-      { id: 2, owner: "Jane Smith", purchaseDate: "2020-03-18", price: "800", active: false, info: "Old model, still reliable", brand: "HP", model: "Pavilion 15", image: "url", serialNumber: "SN789012", qrCode: "QR789012" },
-    ]);
+    const devices = ref<Device[]>([]);
     const isEditModalVisible = ref(false);
     const isDeleteModalVisible = ref(false);
-    const deletingDeviceId = ref<number | null>(null);
-
     const editableDevice = ref<Device>({
       id: 0,
       owner: '',
-      purchaseDate: '',
-      price: '',
+      date_of_purchase: '',
+      price: 0,
       active: false,
-      info: '',
+      description: '',
       brand: '',
       model: '',
-      image: '',
-      serialNumber: '',
-      qrCode: ''
+      serial_no: '',
+      qr_code: '',
+      category_id: 0
     });
 
+    const loadDevices = async () => {
+      try {
+        const response = await axios.get('/api/devices');
+        devices.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch devices:', error);
+      }
+    };
 
-    const fields = [
-      { key: 'owner', label: 'Owner' },
-      { key: 'purchaseDate', label: 'Purchase Date' },
-      { key: 'price', label: 'Price' },
-      { key: 'active', label: 'Active' },
-      { key: 'info', label: 'Info' },
-      { key: 'brand', label: 'Brand' },
-      { key: 'model', label: 'Model' },
-      { key: 'image', label: 'Image' },
-      { key: 'serialNumber', label: 'Serial Number' },
-      { key: 'qrCode', label: 'QR Code' },
-      { key: 'edit', label: 'Edit', sortable: false },
-      { key: 'delete', label: 'Delete', sortable: false }
-    ];
+    onMounted(loadDevices);
 
     const editDevice = (device: Device) => {
       editableDevice.value = { ...device };
       isEditModalVisible.value = true;
     };
 
-    const saveDevice = () => {
+    const saveDevice = async () => {
       if (editableDevice.value) {
-        const index = devices.value.findIndex(d => d.id === editableDevice.value.id);
-        if (index !== -1) {
-          devices.value[index] = {...editableDevice.value};
+        try {
+          await axios.put(`/api/devices/${editableDevice.value.id}`, editableDevice.value);
+          isEditModalVisible.value = false;
+          await loadDevices();
+        } catch (error) {
+          console.error('Failed to update device:', error);
         }
-        isEditModalVisible.value = false;
       }
     };
 
     const confirmDelete = (id: number) => {
-      deletingDeviceId.value = id;
       isDeleteModalVisible.value = true;
+      editableDevice.value = devices.value.find(d => d.id === id) || {
+        id: 0,
+        owner: '',
+        date_of_purchase: '',
+        price: 0,
+        active: false,
+        description: '',
+        brand: '',
+        model: '',
+        serial_no: '',
+        qr_code: '',
+        category_id: 0
+      };
     };
 
-    const deleteDevice = () => {
-      if (deletingDeviceId.value !== null) {
-        devices.value = devices.value.filter(d => d.id !== deletingDeviceId.value);
-        isDeleteModalVisible.value = false;
+    const deleteDevice = async () => {
+      if (editableDevice.value) {
+        try {
+          await axios.delete(`/api/devices/${editableDevice.value.id}`);
+          isDeleteModalVisible.value = false;
+          await loadDevices();
+        } catch (error) {
+          console.error('Failed to delete device:', error);
+        }
       }
     };
+
+    const fields = [
+      { key: 'owner', label: 'Owner' },
+      { key: 'date_of_purchase', label: 'Purchase Date' },
+      { key: 'price', label: 'Price' },
+      { key: 'active', label: 'Active' },
+      { key: 'description', label: 'Description' },
+      { key: 'brand', label: 'Brand' },
+      { key: 'model', label: 'Model' },
+      { key: 'serial_no', label: 'Serial Number' },
+      { key: 'qr_code', label: 'QR Code' },
+      { key: 'category_id', label: 'Category ID' },
+      { key: 'edit', label: 'Edit', sortable: false },
+      { key: 'delete', label: 'Delete', sortable: false }
+    ];
 
     return {
       devices,
@@ -135,9 +155,8 @@ export default defineComponent({
       deleteDevice,
       isEditModalVisible,
       isDeleteModalVisible,
-      editableDevice,
-      deletingDeviceId
-    }
+      editableDevice
+    };
   },
-})
+});
 </script>
