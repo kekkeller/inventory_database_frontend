@@ -7,24 +7,47 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import { userAccounts } from '@/composable/userAccounts'
-import Footer_component from '@/components/footer_component.vue'
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
+import Footer_component from '@/components/footer_component.vue';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
 
 export default defineComponent({
-    components: { Footer_component },
-    setup() {
-        const { accounts } = userAccounts()
-        const fields = [
-            { key: 'email', label: 'Email' },
-            { key: 'isAdmin', label: 'Is Admin' },
-        ]
+  components: { Footer_component },
+  setup() {
+    const accounts = ref<User[]>([]);
+    const fields = [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'role', label: 'Role' }
+    ];
 
-        return {
-            accounts,
-            fields,
-        }
-    },
-})
+    const loadUsers = async () => {
+      try {
+        const response = await axios.get('/api/users');
+        accounts.value = response.data.map((user: any) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }));
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+
+    onMounted(loadUsers);
+
+    return {
+      accounts,
+      fields,
+    };
+  },
+});
 </script>
-<style></style>
