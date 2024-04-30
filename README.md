@@ -28,7 +28,7 @@ Install Intellij : https://www.jetbrains.com/de-de/idea/
 
 ### Clone the Projekt with Git
 
-``git@github.com:slepp22/inventory_database_backend.git``
+``git@github.com:kekkeller/inventory_database_frontend.git``
 
 ### Import your Projekt in Intellij
 
