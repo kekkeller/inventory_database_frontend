@@ -1,117 +1,111 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
-    <h3 class="text-left">Renting Locker</h3>
-    <b-table striped hover :items="lockers" :fields="fields" class="w-full">
-      <template #cell(actions)="{ item }">
-        <b-button
-            variant="secondary"
-            @click="openModal(item)"
-            v-if="!item.isBooked">
-          Book this Locker
-        </b-button>
-      </template>
-    </b-table>
+    <div>
+      <h3 class="text-left">Rent Locker</h3>
+      <b-table striped hover :items="devices" :fields="fields" class="w-full">
+        <template #cell(edit)="data">
+          <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
+        </template>
+      </b-table>
 
-    <b-modal
-        id="locker-details"
-        v-model="isModalVisible"
-        title="Locker Details"
-        hide-footer
-        @hide="closeModal">
-      <template v-if="selectedLocker">
-        <div v-if="!bookingConfirmed">
-          <p><strong>Name:</strong> {{ selectedLocker.Name }}</p>
-          <p><strong>Location:</strong> {{ selectedLocker.Location }}</p>
-          <b-button variant="success" class="mr-2" @click="confirmBooking">Book Locker</b-button>
-          <b-button variant="danger" @click="closeModal">Cancel</b-button>
-        </div>
-        <div v-else>
-          <p>Your booking pin: {{ bookingPin }}</p>
-          <b-img :src="mapImageUrl"></b-img>
-          <b-button variant="primary" class="mt-2" @click="closeModal">Okay</b-button>
-        </div>
-      </template>
-    </b-modal>
+      <!-- Modal for displaying device details -->
+      <b-modal id="details-modal" v-model="isModalVisible" title="Device Details" ok-only ok-title="Close">
+        <template v-if="selectedItem">
+          <p><b>Owner:</b> {{ selectedItem.owner }}</p>
+          <p><b>Date of Purchase:</b> {{ selectedItem.date_of_purchase }}</p>
+          <p><b>Price:</b> {{ selectedItem.price }}</p>
+          <p><b>Active:</b> {{ selectedItem.active }}</p>
+          <p><b>Description:</b> {{ selectedItem.description }}</p>
+          <p><b>Brand:</b> {{ selectedItem.brand }}</p>
+          <p><b>Model:</b> {{ selectedItem.model }}</p>
+          <p><b>Serial Number:</b> {{ selectedItem.serial_no }}</p>
+          <p><b>QR Code:</b> {{ selectedItem.qr_code }}</p>
+          <p><b>Category:</b> {{ getCategoryName(selectedItem.category_id) }}</p>
+        </template>
+      </b-modal>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
 
-interface Locker {
-  Name: string;
-  Location: string;
-  isBooked: boolean;
+interface Device {
+  id: number;
+  owner: string;
+  date_of_purchase: string;
+  price: number;
+  active: boolean;
+  description: string;
+  brand: string;
+  model: string;
+  serial_no: string;
+  qr_code: string;
+  category_id: number;
 }
 
 export default defineComponent({
+  components: {},
   setup() {
-    const mapImageUrl = new URL('../assets/map.JPG', import.meta.url).href;
-    const lockers = ref<Locker[]>([
-      {
-        Name: 'Locker 1',
-        Location: 'Schöfferstraße 3, 64295 Darmstadt, Deutschland',
-        isBooked: false,
-      },
-      {
-        Name: 'Locker 2',
-        Location: 'Talonpojankatu 2, 67100 Kokkola',
-        isBooked: false,
-      },
-      {
-        Name: 'Locker 3',
-        Location: 'Schöfferstraße 3, 64295 Darmstadt, Deutschland',
-        isBooked: false,
-      }
-    ]);
+    const devices = ref<Device[]>([]);
+    const isModalVisible = ref(false);
+    const selectedItem = ref<Device | null>(null);
+    const categories = ref<any[]>([]);
 
     const fields = [
-      { key: 'Name', label: 'Name' },
-      { key: 'Location', label: 'Location' },
-      { key: 'actions', label: '', sortable: false }
+      { key: 'price', label: 'Price' },
+      { key: 'active', label: 'Active' },
+      { key: 'brand', label: 'Brand' },
+      { key: 'model', label: 'Model' },
+      { key: 'category_id', label: 'Category' },
+      { key: 'edit', label: 'Details', sortable: false },
     ];
 
-    const isModalVisible = ref(false);
-    const selectedLocker = ref<Locker | null>(null);
-    const bookingConfirmed = ref(false);
-    const bookingPin = ref("");
-
-    function openModal(item: Locker) {
-      selectedLocker.value = item;
-      isModalVisible.value = true;
-      bookingConfirmed.value = false;
-    }
-
-    function closeModal() {
-      isModalVisible.value = false;
-      bookingConfirmed.value = false;
-      bookingPin.value = "";
-    }
-
-    function confirmBooking() {
-      if (selectedLocker.value) {
-        selectedLocker.value.isBooked = true;
-        bookingConfirmed.value = true;
-        bookingPin.value = Math.floor(1000 + Math.random() * 9000).toString(); // Generate a random 4-digit pin
+    const loadDevices = async () => {
+      try {
+        const response = await axios.get('/api/devices');
+        devices.value = response.data.filter((device: Device) => device.brand === 'Locker').map((device: Device) => ({
+          ...device,
+          category_id: getCategoryName(device.category_id)
+        }));
+      } catch (error) {
+        console.error('Failed to fetch devices:', error);
       }
-    }
+    };
+
+    const loadCategories = async () => {
+      try {
+        const response = await axios.get('/api/categories');
+        categories.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+
+    const showDeviceDetails = (item: Device) => {
+      selectedItem.value = item;
+      isModalVisible.value = true;
+    };
+
+    const getCategoryName = (categoryId: number) => {
+      const category = categories.value.find(cat => cat.id === categoryId);
+      return category ? category.name : '';
+    };
+
+    onMounted(async () => {
+      await loadCategories();
+      await loadDevices();
+    });
 
     return {
-      lockers,
+      devices,
       fields,
       isModalVisible,
-      selectedLocker,
-      openModal,
-      closeModal,
-      confirmBooking,
-      bookingConfirmed,
-      bookingPin,
-      mapImageUrl
+      selectedItem,
+      getCategoryName,
+      showDeviceDetails
     };
   },
 });
 </script>
-
-<style scoped>
-/* Additional styles if needed */
-</style>
