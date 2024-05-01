@@ -1,14 +1,20 @@
 <template>
   <div class="report-container">
     <h2>Report a Problem</h2>
-    <form ref="form" @submit.prevent="submitReport" class="form-container">
+    <form ref="formRef" @submit.prevent="submitReport" class="form-container">
       <div class="form-group">
         <label for="description">Problem Description:</label>
         <textarea id="description" v-model="report.description" rows="4" required></textarea>
       </div>
       <div class="form-group">
-        <label for="file">Upload File:</label>
-        <input type="file" id="file" ref="fileInput" @change="handleFileUpload" required>
+        <label for="image">Image URL:</label>
+        <input type="text" id="image" v-model="report.image" required>
+      </div>
+      <div class="form-group">
+        <label for="booking">Select Booking:</label>
+        <select id="booking" v-model="report.booking_id" required>
+          <option v-for="booking in bookings" :key="booking.id" :value="booking.id">{{ booking.id }}</option>
+        </select>
       </div>
       <button type="submit" class="submit-btn">Submit Report</button>
       <p v-if="submitted" class="success-message">Report has been successfully submitted!</p>
@@ -17,43 +23,47 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
+
+interface Report {
+  date: string;
+  description: string;
+  image: string;
+  booking_id: number | null;
+}
+
+interface Booking {
+  id: number;
+}
 
 export default defineComponent({
   name: 'ReportProblem',
   setup() {
-    const form = ref(null);
-    const fileInput = ref(null);
-    const report = reactive({
+    const formRef = ref<HTMLFormElement | null>(null);
+    const report = ref<Report>({
+      date: '',
       description: '',
-      file: null
+      image: '',
+      booking_id: null
     });
     const submitted = ref(false);
+    const bookings = ref<Booking[]>([]);
 
-    const handleFileUpload = event => {
-      report.file = event.target.files[0];
-      if (report.file) {
-        console.log('File selected:', report.file.name);
-      }
+    const getCurrentDateTime = (): string => {
+      return new Date().toISOString();
     };
 
     const submitReport = async () => {
-      if (!report.description || !report.file) {
-        alert('Description and file are required!');
+      if (!report.value.description || !report.value.image || !report.value.booking_id) {
+        alert('Description, image URL, and booking are required!');
         return;
       }
 
-      const formData = new FormData();
-      formData.append('description', report.description);
-      formData.append('file', report.file);
+      report.value.date = getCurrentDateTime();
 
       try {
-        const response = await axios.post('https://dbinveno.free.beeceptor.com', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        const response = await axios.post('/api/reports', report.value);
         console.log('Response:', response.data);
         submitted.value = true;
         setTimeout(() => { submitted.value = false; }, 5000);
@@ -65,49 +75,70 @@ export default defineComponent({
     };
 
     const resetForm = () => {
-      if (form.value) {
-        form.value.reset();
-        report.description = ''; // Reset Vue model
-        report.file = null; // Reset Vue model
-      }
-      if (fileInput.value) {
-        fileInput.value.value = ''; // Reset file input
+      const form = formRef.value;
+      if (form) {
+        form.reset();
+        report.value.description = '';
+        report.value.image = '';
+        report.value.booking_id = null;
       }
     };
 
-    return { report, submitReport, handleFileUpload, submitted, form, fileInput };
+    const fetchBookings = async () => {
+      try {
+        const userId = sessionStorage.getItem('userId');
+        const response = await axios.get(`/api/bookings/allbyUserID/${userId}`);
+        bookings.value = response.data;
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        alert('Failed to fetch bookings.');
+      }
+    };
+
+    onMounted(() => {
+      fetchBookings();
+    });
+
+    return { formRef, report, submitReport, submitted, bookings };
   },
 });
 </script>
 
 <style>
-
 .report-container {
   max-width: 500px;
   margin: 40px auto;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border-radius: 10px; /* Abgerundete Ecken hinzugefügt */
+  font-family: Arial, sans-serif; /* Verwendung der Standard-Schriftart des Projekts */
 }
+
 .form-container {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .form-group {
   width: 100%;
   margin-bottom: 20px;
 }
+
 .form-group label {
   display: block;
   margin-bottom: 5px;
 }
-.form-group input[type="file"],
-.form-group textarea {
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
 .submit-btn {
   background-color: #4CAF50;
   color: white;
@@ -116,11 +147,14 @@ export default defineComponent({
   border-radius: 4px;
   cursor: pointer;
 }
+
 .submit-btn:hover {
   background-color: #45a049;
 }
+
 .success-message {
   color: green;
   margin-top: 20px;
 }
 </style>
+
