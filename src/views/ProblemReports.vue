@@ -5,77 +5,73 @@
       <template #cell(view)="data">
         <b-button variant="info" @click="viewReport(data.item)">View</b-button>
       </template>
-      <template #cell(delete)="data">
-        <b-button variant="danger" @click="confirmDelete(data.item.id)">Delete</b-button>
-      </template>
     </b-table>
-
-
     <!-- Modal for viewing reports -->
     <b-modal id="view-modal" v-model="isViewModalVisible" title="Report Details" ok-only ok-title="Close">
       <div>
-        <p><strong>User ID:</strong> {{ selectedReport.userId }}</p>
-        <img :src="selectedReport.photo" alt="Report Photo" class="w-full">
-        <p>{{ selectedReport.description }}</p>
+        <p><strong>Date:</strong> {{ selectedReport.date }}</p>
+        <img :src="selectedReport.image" alt="Report Photo" class="w-full">
+        <p><strong>Description:</strong> {{ selectedReport.description }}</p>
       </div>
     </b-modal>
 
-    <!-- Confirmation Modal for deleting reports -->
-    <b-modal id="delete-modal" v-model="isDeleteModalVisible" title="Confirm Delete" ok-title="Yes" @ok="deleteReport" ok-variant="danger">
-      Are you sure you want to delete this report?
-    </b-modal>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import axios from 'axios';
 import { BTable, BButton, BModal } from 'bootstrap-vue-3';
+
+interface Report {
+  date: string;
+  description: string;
+  image: string;
+  booking_id: number;
+  id: number;
+}
 
 export default defineComponent({
   components: { BTable, BButton, BModal },
   setup() {
-    const reports = ref([
-      { id: 1, userId: 101, photo: 'url_to_photo1.jpg', description: 'Problem with item X' },
-      { id: 2, userId: 102, photo: 'url_to_photo2.jpg', description: 'Issue with service Y' },
-      { id: 3, userId: 103, photo: 'url_to_photo3.jpg', description: 'Delivery issue on order Z' },
-      { id: 4, userId: 104, photo: 'url_to_photo4.jpg', description: 'Faulty product found' },
-      { id: 5, userId: 105, photo: 'url_to_photo5.jpg', description: 'Software error encountered' }
-    ]);
+    const reports = ref<Report[]>([]);
+    const isViewModalVisible = ref(false);
+    const selectedReport = ref<Report>({
+      date: '',
+      description: '',
+      image: '',
+      booking_id: 0,
+      id: 0,
+    });
 
     const fields = [
-      { key: 'userId', label: 'User ID' },
+      { key: 'date', label: 'Date' },
       { key: 'description', label: 'Description' },
       { key: 'view', label: 'View', sortable: false },
-      { key: 'delete', label: 'Delete', sortable: false }
     ];
 
-    const isViewModalVisible = ref(false);
-    const isDeleteModalVisible = ref(false);
-    const selectedReport = ref({});
+    const loadReports = async () => {
+      try {
+        const response = await axios.get('/api/reports');
+        reports.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch reports:', error);
+      }
+    };
 
-    const viewReport = (report) => {
+    onMounted(loadReports);
+
+    const viewReport = (report: Report) => {
       selectedReport.value = report;
       isViewModalVisible.value = true;
     };
 
-    const confirmDelete = (id) => {
-      selectedReport.value = reports.value.find(r => r.id === id);
-      isDeleteModalVisible.value = true;
-    };
-
-    const deleteReport = () => {
-      reports.value = reports.value.filter(r => r.id !== selectedReport.value.id);
-      isDeleteModalVisible.value = false;
-    };
 
     return {
       reports,
       fields,
       viewReport,
-      confirmDelete,
-      deleteReport,
       isViewModalVisible,
-      isDeleteModalVisible,
       selectedReport
     };
   }

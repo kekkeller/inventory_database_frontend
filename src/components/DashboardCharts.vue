@@ -1,45 +1,35 @@
 <template>
   <div class="chart-container">
-    <line-chart :chart-data="salesData" :options="chartOptions"></line-chart>
-    <bar-chart :chart-data="usageData" :options="chartOptions"></bar-chart>
+    <!-- Bar Chart für Gerätebuchungen -->
+    <bar-chart :chart-data="bookingData" :options="bookingOptions"></bar-chart>
+
+    <!-- Line Chart für Verkaufszahlen -->
+    <line-chart :chart-data="revenueData" :options="revenueOptions"></line-chart>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Chart, registerables } from 'chart.js';
-import {BarChart, LineChart} from 'vue-chart-3';
+import { BarChart, LineChart } from 'vue-chart-3';
+import axios from 'axios';
 
 Chart.register(...registerables);
 
-// Daten für Verkaufszahlen
-const salesData = ref({
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-  datasets: [
-    {
-      label: 'Monthly Sales ($)',
-      data: [5000, 6000, 7000, 8000, 7500, 8200],
-      borderColor: 'rgb(75, 192, 192)',
-      backgroundColor: 'rgba(75, 192, 192, 0.5)',
-    }
-  ]
+// Daten für Buchungen der Geräte
+const bookingData = ref({
+  labels: [],
+  datasets: []
 });
 
-// Daten für Benutzungsstatistiken
-const usageData = ref({
-  labels: ['iPhone 12', 'MacBook Pro', 'iPad Pro', 'Samsung S21'],
-  datasets: [
-    {
-      label: 'Device Usage',
-      data: [50, 60, 70, 45],
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    }
-  ]
+// Daten für Umsatz
+const revenueData = ref({
+  labels: [],
+  datasets: []
 });
 
-// Chart-Optionen
-const chartOptions = {
+// Optionen für das Buchungs-Chart
+const bookingOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -48,19 +38,118 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Chart.js Line and Bar Chart'
+      text: 'Device Bookings'
     }
   }
 };
+
+// Optionen für das Umsatz-Chart
+const revenueOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    title: {
+      display: true,
+      text: 'Revenue'
+    }
+  }
+};
+
+// Methode zum Laden der Buchungsdaten
+const loadBookingData = async () => {
+  try {
+    const response = await axios.get('/api/bookings');
+    const bookings = response.data;
+
+    // Daten für die Buchungen der Geräte einrichten
+    const deviceBookings = {};
+
+    // Durchlaufe die Buchungen und berechne die Gesamtzahl für jedes Gerät
+    bookings.forEach(booking => {
+      const deviceID = booking.device_id;
+
+      // Gerät für Buchungszeit hinzufügen
+      if (!deviceBookings[deviceID]) {
+        deviceBookings[deviceID] = 1;
+      } else {
+        deviceBookings[deviceID]++;
+      }
+    });
+
+    // Konvertiere die Objekte in Arrays für das Chart-Format
+    bookingData.value.labels = Object.keys(deviceBookings);
+    bookingData.value.datasets = [
+      {
+        label: 'Device Bookings',
+        data: Object.values(deviceBookings),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      }
+    ];
+  } catch (error) {
+    console.error('Failed to load booking data:', error);
+  }
+};
+
+// Methode zum Laden der Umsatzdaten
+const loadRevenueData = async () => {
+  try {
+    const response = await axios.get('/api/bookings');
+    const bookings = response.data;
+
+    // Summiere den Umsatz für jeden Monat
+    const revenueByMonth = {};
+
+    bookings.forEach(booking => {
+      const month = new Date(booking.time_start).getMonth();
+      const revenue = booking.price;
+
+      if (!revenueByMonth[month]) {
+        revenueByMonth[month] = revenue;
+      } else {
+        revenueByMonth[month] += revenue;
+      }
+    });
+
+    // Konvertiere die Objekte in Arrays für das Chart-Format
+    revenueData.value.labels = Object.keys(revenueByMonth).map(month => getMonthName(month));
+    revenueData.value.datasets = [
+      {
+        label: 'Revenue ($)',
+        data: Object.values(revenueByMonth),
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+      }
+    ];
+  } catch (error) {
+    console.error('Failed to load revenue data:', error);
+  }
+};
+
+// Hilfsmethode, um den Monatsnamen basierend auf dem Monatsindex zu erhalten
+const getMonthName = (monthIndex) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[monthIndex];
+};
+
+// Daten laden, wenn die Komponente montiert wird
+onMounted(() => {
+  loadBookingData();
+  loadRevenueData();
+});
 </script>
+
 <style>
 .chart-container {
   display: flex;
-  flex-direction: row; /* Geändert von column zu row */
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-around;
   align-items: center;
   gap: 20px;
-  width: 100%; /* Stelle sicher, dass der Container die volle Breite einnimmt */
-  height: 400px; /* Definiere eine feste Höhe für den Container */
+  width: 100%;
+  height: 400px;
 }
 </style>

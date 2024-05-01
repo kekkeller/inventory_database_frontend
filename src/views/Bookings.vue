@@ -3,14 +3,12 @@
     <h3 class="text-left">All Bookings</h3>
     <b-table striped hover :items="rentals" :fields="fields" class="w-full">
     </b-table>
-    <footer_component></footer_component>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
-import Footer_component from "@/components/footer_component.vue";
 
 interface Rental {
   id: number;
@@ -24,7 +22,7 @@ interface Rental {
 }
 
 export default defineComponent({
-  components: { Footer_component },
+  components: { },
   setup() {
     const rentals = ref<Rental[]>([]);
     const fields = [
