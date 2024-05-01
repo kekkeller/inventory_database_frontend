@@ -52,6 +52,8 @@ export default defineComponent({
         // Hier folgt die Logik basierend auf der Antwort
         if (response.data && response.data.role) {
           const role = response.data.role === 'admin' ? 'Admin' : 'User';
+          console.log(response.data);
+          sessionStorage.setItem('userId', response.data.id);
           sessionStorage.setItem('isAuthenticated', 'true');
           sessionStorage.setItem('isAdmin', role === 'Admin' ? 'true' : 'false');
           setLoggedIn(role);
