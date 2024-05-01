@@ -1,80 +1,107 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
-    <h3 class="text-left">Renting Device</h3>
-    <h1 class="text-2xl mb-8"></h1>
-    <b-table striped hover :items="bookings" :fields="fields" class="w-full">
-      <template #cell(actions)="{ item }">
-        <b-button variant="secondary" @click="showDetails(item)">Details</b-button>
-      </template>
-    </b-table>
+    <div>
+      <h3 class="text-left">Rent Device</h3>
+      <b-table striped hover :items="devices" :fields="fields" class="w-full">
+        <template #cell(edit)="data">
+          <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button> <!-- Button-Text geändert -->
+        </template>
+      </b-table>
 
-    <b-modal id="details-modal" v-model="isModalVisible" title="Booking Details" ok-only ok-title="Close">
-      <template v-if="selectedItem">
-        <p><b>Category:</b> {{ selectedItem.Category }}</p>
-        <p><b>Device:</b> {{ selectedItem.Device }}</p>
-        <p><b>Price:</b> {{ selectedItem.Price }}</p>
-        <p><b>Location:</b> {{ selectedItem.Location }}</p>
-      </template>
-    </b-modal>
+      <!-- Modal for displaying device details -->
+      <b-modal id="details-modal" v-model="isModalVisible" title="Device Details" ok-only ok-title="Close">
+        <template v-if="selectedItem">
+          <p><b>Active:</b> {{ selectedItem.active }}</p>
+          <p><b>Description:</b> {{ selectedItem.description }}</p>
+          <p><b>Brand:</b> {{ selectedItem.brand }}</p>
+          <p><b>Model:</b> {{ selectedItem.model }}</p>
+          <p><b>QR Code:</b> {{ selectedItem.qr_code }}</p>
+        </template>
+      </b-modal>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
 
-interface Booking {
+interface Device {
   id: number;
-  Category: string;
-  Device: string;
-  Price: string;
-  Location: string;
+  owner: string;
+  date_of_purchase: string;
+  price: number;
+  active: boolean;
+  description: string;
+  brand: string;
+  model: string;
+  serial_no: string;
+  qr_code: string;
+  category_id: number;
 }
 
 export default defineComponent({
   components: {},
   setup() {
-    const bookings = ref<Booking[]>([]);
+    const devices = ref<Device[]>([]);
     const isModalVisible = ref(false);
-    const selectedItem = ref<Booking | null>(null);
+    const selectedItem = ref<Device | null>(null);
+    const categories = ref<any[]>([]);
 
     const fields = [
-      { key: 'Category', label: 'Category' },
-      { key: 'Device', label: 'Device' },
-      { key: 'Price', label: 'Price' },
-      { key: 'Location', label: 'Location' },
-      { key: 'actions', label: 'Actions', sortable: false }  // Add a column for actions
+      { key: 'category_id', label: 'Category'},
+      { key: 'model', label: 'Model' },
+      { key: 'brand', label: 'Brand' },
+      // { key: 'price', label: 'Price' },
+      { key: 'active', label: 'Active' },
+       // Anzeigen der Kategorie-ID
+      { key: 'edit', label: 'Details', sortable: false }, // Label für den Button geändert
     ];
 
-    const showDetails = (item: Booking) => {
+    const loadDevices = async () => {
+      try {
+        const response = await axios.get('/api/devices');
+        devices.value = response.data.map((device: Device) => ({
+          ...device,
+          category_id: getCategoryName(device.category_id)
+        }));
+      } catch (error) {
+        console.error('Failed to fetch devices:', error);
+      }
+    };
+
+    const loadCategories = async () => {
+      try {
+        const response = await axios.get('/api/categories');
+        categories.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+
+    const showDeviceDetails = (item: Device) => {
       selectedItem.value = item;
       isModalVisible.value = true;
     };
 
-    const fetchBookings = async () => {
-      try {
-        const response = await axios.get('https://api-generator.retool.com/1gXbZE/data');
-        bookings.value = response.data.map((item: any) => ({
-          id: item.id,
-          Category: item['Column 1'],
-          Device: item['Column 2'],
-          Price: item['Column 3'],
-          Location: item['Column 4']
-        }));
-      } catch (error) {
-        console.error('Failed to fetch bookings:', error);
-      }
+    const getCategoryName = (categoryId: number) => {
+      const category = categories.value.find(cat => cat.id === categoryId);
+      return category ? category.name : '';
     };
 
-    onMounted(fetchBookings);
+    onMounted(async () => {
+      await loadCategories();
+      await loadDevices();
+    });
 
     return {
-      bookings,
+      devices,
       fields,
-      showDetails,
       isModalVisible,
-      selectedItem
-    }
+      selectedItem,
+      getCategoryName,
+      showDeviceDetails
+    };
   },
-})
+});
 </script>

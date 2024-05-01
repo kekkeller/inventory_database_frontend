@@ -6,6 +6,12 @@
       <template #cell(actions)="{ item }">
         <b-button variant="secondary" @click="showDetails(item)">Details</b-button>
       </template>
+      <template #cell(time_start)="data">
+        {{ formatDateTime(data.item.time_start) }}
+      </template>
+      <template #cell(time_end)="data">
+        {{ formatDateTime(data.item.time_end) }}
+      </template>
     </b-table>
 
     <b-modal id="details-modal" v-model="isModalVisible" title="Booking Details" ok-only ok-title="Close">
