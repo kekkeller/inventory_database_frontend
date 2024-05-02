@@ -13,10 +13,15 @@
         {{ formatDateTime(data.item.time_start) }}
       </template>
       <template #cell(time_end)="data">
-        {{ formatDateTime(data.item.time_end) }}
+        <!-- Bedingte Anzeige für Endzeit -->
+        <span v-if="data.item.active">--</span>
+        <span v-else>{{ formatDateTime(data.item.time_end) }}</span>
       </template>
       <template #cell(device_id)="data">
         {{ deviceMap[data.item.device_id] }}
+      </template>
+      <template #cell(booking_price)="data">
+        {{ data.item.booking_price }} €
       </template>
     </b-table>
 
@@ -80,6 +85,7 @@ export default defineComponent({
       { key: 'time_start', label: 'Start Time' },
       { key: 'time_end', label: 'End Time' },
       { key: 'device_id', label: 'Device Model' },
+      { key: 'booking_price', label: 'Booking Price'  },
       { key: 'actions', label: 'Actions', sortable: false },
       { key: 'charge', label: '', sortable: false }
     ];

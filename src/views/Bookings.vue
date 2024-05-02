@@ -2,6 +2,11 @@
   <div class="mx-auto my-10" style="width: 90%;">
     <h3 class="text-left">All Bookings</h3>
     <b-table striped hover :items="rentals" :fields="fields" class="w-full">
+      <template #cell(time_end)="data">
+        <!-- Bedingte Anzeige für Endzeit -->
+        <span v-if="data.item.active">--</span>
+        <span v-else>{{ (data.item.time_end) }}</span>
+      </template>
     </b-table>
   </div>
 </template>
