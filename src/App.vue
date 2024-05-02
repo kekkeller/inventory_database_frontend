@@ -1,8 +1,8 @@
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue'
 import NavBar from '@/components/NavBar.vue'
-import AdminNavBar from '@/components/AdminNavBar.vue'
-import Footer from '@/components/Footer.vue'
+import AdminNavBar from './components/AdminNavBar.vue'
+import Footer from './components/Footer.vue'
 import { useLoggedIn } from "./composable/useLoggedIn";
 
 export default defineComponent({
