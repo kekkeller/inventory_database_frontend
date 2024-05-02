@@ -55,7 +55,7 @@ export default defineComponent({
         params.append('email', credentials.value.email);
         params.append('password', credentials.value.password);
 
-        const response = await axios.post('/api/loginIsValid?' + params.toString());
+        const response = await axios.post('https://f-itplfo6nya-uc.a.run.app/loginIsValid?' + params.toString());
 
         // Hier folgt die Logik basierend auf der Antwort
         if (response.data && response.data.role) {

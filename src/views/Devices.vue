@@ -167,7 +167,7 @@ export default defineComponent({
 
     const loadDevices = async () => {
       try {
-        const response = await axios.get('/api/devices');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/devices');
         devices.value = response.data.map((device: Device) => ({
           ...device,
           category_id: getCategoryName(device.category_id)
@@ -179,7 +179,7 @@ export default defineComponent({
 
     const loadCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/categories');
         categories.value = response.data;
         categoryOptions.value = categories.value.map((category: any) => ({
           value: category.id,
@@ -201,7 +201,7 @@ export default defineComponent({
 
     const addDevice = async () => {
       try {
-        await axios.post('/api/devices', newDevice);
+        await axios.post('https://f-itplfo6nya-uc.a.run.app/devices', newDevice);
         isAddModalVisible.value = false;
         await loadDevices();
       } catch (error) {
@@ -217,7 +217,7 @@ export default defineComponent({
     const saveDevice = async () => {
       if (editableDevice.value) {
         try {
-          await axios.put(`/api/devices/${editableDevice.value.id}`, editableDevice.value);
+          await axios.put(`https://f-itplfo6nya-uc.a.run.app/devices/${editableDevice.value.id}`, editableDevice.value);
           isEditModalVisible.value = false;
           await loadDevices();
         } catch (error) {
@@ -248,7 +248,7 @@ export default defineComponent({
     const deleteDevice = async () => {
       if (editableDevice.value) {
         try {
-          await axios.delete(`/api/devices/${editableDevice.value.id}`);
+          await axios.delete(`https://f-itplfo6nya-uc.a.run.appdevices/${editableDevice.value.id}`);
           isDeleteModalVisible.value = false;
           await loadDevices();
         } catch (error) {

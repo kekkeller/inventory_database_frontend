@@ -75,7 +75,7 @@ export default defineComponent({
 
     const createCategory = async () => {
       try {
-        const response = await axios.post('/api/categories', { name: newCategoryName.value });
+        const response = await axios.post('https://f-itplfo6nya-uc.a.run.app/categories', { name: newCategoryName.value });
         categories.value.push(response.data);
         newCategoryName.value = '';  // Reset the input after successful creation
         isCreateModalVisible.value = false;
@@ -93,7 +93,7 @@ export default defineComponent({
     const saveCategory = async () => {
       if (editableCategory.value) {
         try {
-          const response = await axios.put(`/api/categories/${editableCategory.value.id}`, {
+          const response = await axios.put(`https://f-itplfo6nya-uc.a.run.app/categories/${editableCategory.value.id}`, {
             name: editableCategory.value.name
           });
           const index = categories.value.findIndex(c => c.id === editableCategory.value.id);
@@ -116,7 +116,7 @@ export default defineComponent({
     const deleteCategory = async () => {
       if (deletingCategoryId.value !== null) {
         try {
-          await axios.delete(`/api/categories/${deletingCategoryId.value}`);
+          await axios.delete(`https://f-itplfo6nya-uc.a.run.app/categories/${deletingCategoryId.value}`);
           categories.value = categories.value.filter(c => c.id !== deletingCategoryId.value);
           isDeleteModalVisible.value = false;
         } catch (error) {

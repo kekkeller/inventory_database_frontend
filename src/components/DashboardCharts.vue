@@ -61,7 +61,7 @@ const revenueOptions = {
 // Methode zum Laden der Buchungsdaten
 const loadBookingData = async () => {
   try {
-    const response = await axios.get('/api/bookings');
+    const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/bookings');
     const bookings = response.data;
 
     // Daten für die Buchungen der Geräte einrichten
@@ -97,7 +97,7 @@ const loadBookingData = async () => {
 // Methode zum Laden der Umsatzdaten
 const loadRevenueData = async () => {
   try {
-    const response = await axios.get('/api/bookings');
+    const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/bookings');
     const bookings = response.data;
 
     // Summiere den Umsatz für jeden Monat

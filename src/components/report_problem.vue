@@ -68,7 +68,7 @@ export default defineComponent({
       report.value.date = getCurrentDateTime();
 
       try {
-        const response = await axios.post('/api/reports', report.value);
+        const response = await axios.post('https://f-itplfo6nya-uc.a.run.app/reports', report.value);
         console.log('Response:', response.data);
         submitted.value = true;
         setTimeout(() => { submitted.value = false; }, 5000);
@@ -92,7 +92,7 @@ export default defineComponent({
     const fetchBookings = async () => {
       try {
         const userId = sessionStorage.getItem('userId');
-        const response = await axios.get(`/api/bookings/allbyUserID/${userId}`);
+        const response = await axios.get(`https://f-itplfo6nya-uc.a.run.app/bookings/allbyUserID/${userId}`);
         bookings.value = response.data;
       } catch (error) {
         console.error('Error fetching bookings:', error);

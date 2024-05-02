@@ -101,7 +101,7 @@ export default defineComponent({
 
     const loadDevices = async () => {
       try {
-        const response = await axios.get('/api/devices/unused');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/devices/unused');
         devices.value = response.data.filter((device: Device) => device.brand === 'Locker').map((device: Device) => ({
           ...device,
           category_id: getCategoryName(device.category_id)
@@ -113,7 +113,7 @@ export default defineComponent({
 
     const loadCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/categories');
         categories.value = response.data;
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -136,7 +136,7 @@ export default defineComponent({
           pin: 0
         };
         console.log(bookingData);
-        await axios.post('/api/bookings', bookingData).then(response => { bookingPin.value = response.data.pin });
+        await axios.post('https://f-itplfo6nya-uc.a.run.app/bookings', bookingData).then(response => { bookingPin.value = response.data.pin });
         pinDigits.value = bookingPin.value.toString().split("");
         console.log(pinDigits);
         console.log('Device rented successfully:', item);

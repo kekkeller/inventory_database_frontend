@@ -108,7 +108,7 @@ export default defineComponent({
     const fetchBookings = async () => {
       try {
         const userId = Number(sessionStorage.getItem('userId'));
-        const response = await axios.get(`/api/bookings/allbyUserID/${userId}`);
+        const response = await axios.get(`https://f-itplfo6nya-uc.a.run.app/bookings/allbyUserID/${userId}`);
         bookings.value = response.data;
         const deviceIds = bookings.value.map(booking => booking.device_id);
         await fetchDeviceDetails(deviceIds);
@@ -118,7 +118,7 @@ export default defineComponent({
     };
 
     const fetchDeviceDetails = async (deviceIds: number[]) => {
-      const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
+      const response = await axios.get(`https://f-itplfo6nya-uc.a.run.app/devices?ids=${deviceIds.join(',')}`);
       response.data.forEach((device: Device) => {
         deviceMap.value[device.id] = device.model;
       });
@@ -142,7 +142,7 @@ export default defineComponent({
       try {
         if (selectedItem.value) {
           const updatedBooking = { ...selectedItem.value, active: false, time_end: new Date().toISOString() };
-          await axios.put(`/api/bookings/${selectedItem.value.id}`, updatedBooking);
+          await axios.put(`https://f-itplfo6nya-uc.a.run.app/bookings/${selectedItem.value.id}`, updatedBooking);
           isCloseBookingModalVisible.value = false;
           await fetchBookings();
         }

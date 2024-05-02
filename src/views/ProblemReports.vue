@@ -57,7 +57,7 @@ export default defineComponent({
 
     const loadReports = async () => {
       try {
-        const response = await axios.get('/api/reports');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/reports');
         reports.value = response.data;
       } catch (error) {
         console.error('Failed to fetch reports:', error);

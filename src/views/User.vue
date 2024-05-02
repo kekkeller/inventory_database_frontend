@@ -29,7 +29,7 @@ export default defineComponent({
 
     const loadUsers = async () => {
       try {
-        const response = await axios.get('/api/users');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/users');
         accounts.value = response.data.map((user: any) => ({
           id: user.id,
           name: user.name,

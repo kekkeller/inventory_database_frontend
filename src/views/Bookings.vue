@@ -42,7 +42,7 @@ export default defineComponent({
 
     const loadBookings = async () => {
       try {
-        const response = await axios.get('/api/bookings');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/bookings');
         rentals.value = response.data;
       } catch (error) {
         console.error('Failed to fetch bookings:', error);
