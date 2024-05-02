@@ -81,6 +81,7 @@
         <b-form-input v-model="editableDevice.rent_price_per_hour" placeholder="Price" type="number" required></b-form-input>
         <b-form-checkbox v-model="editableDevice.active">Active</b-form-checkbox>
         <b-form-input v-model="editableDevice.description" placeholder="Description" required></b-form-input>
+        <b-form-input v-model="editableDevice.image" placeholder="Image" required></b-form-input>
         <b-form-input v-model="editableDevice.brand" placeholder="Brand" required></b-form-input>
         <b-form-input v-model="editableDevice.model" placeholder="Model" required></b-form-input>
         <b-form-input v-model="editableDevice.serial_no" placeholder="Serial Number" required></b-form-input>
@@ -121,6 +122,7 @@ interface Device {
   serial_no: string;
   qr_code: string;
   category_id: number;
+  image: string;
 }
 
 export default defineComponent({
@@ -142,7 +144,8 @@ export default defineComponent({
       model: '',
       serial_no: '',
       qr_code: '',
-      category_id: 0
+      category_id: 0,
+      image: ''
     });
     const newDevice = ({
       owner: '',
@@ -155,7 +158,8 @@ export default defineComponent({
       model: '',
       serial_no: '',
       qr_code: '',
-      category_id: 0
+      category_id: 0,
+      image: ''
     });
 
     const categories = ref<any[]>([]);
@@ -236,7 +240,8 @@ export default defineComponent({
         model: '',
         serial_no: '',
         qr_code: '',
-        category_id: 0
+        category_id: 0,
+        image: ''
       };
     };
 

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .active-tab {
-    background-color: #4A5568;
+    background-color: #7Fa44b;
     color: white;
     border-radius: 0.375rem;
 }

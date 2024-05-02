@@ -5,6 +5,7 @@
         <div class="flex">
           <!-- Logo und Titel, ähnlich wie in der Hauptnavbar -->
           <div class="flex-shrink-0 flex items-center">
+            <img :src="logoImageUrl" alt="Icon" class="h-10 w-auto">
             <a class="text-white text-2xl no-underline">Admin Panel - Database Inventory</a>
           </div>
           <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4 pl-5">
@@ -59,6 +60,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const {setLoggedIn} = useLoggedIn();
+    const logoImageUrl = new URL('../assets/logo.png', import.meta.url).href;
 
     function logout() {
       // Session-Daten löschen
@@ -66,7 +68,7 @@ export default defineComponent({
       // Umleitung zum Login-Screen
       router.push('/login');
     }
-    return { logout };
+    return { logout, logoImageUrl };
   }
 });
 </script>
