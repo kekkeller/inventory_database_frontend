@@ -16,24 +16,69 @@
 
       <!-- Modal for adding new device -->
       <b-modal id="add-modal" v-model="isAddModalVisible" title="Add New Device" @ok="addDevice">
-        <b-form-input v-model="newDevice.owner" placeholder="Owner" required></b-form-input>
-        <b-form-input v-model="newDevice.date_of_purchase" placeholder="Purchase Date" required></b-form-input>
-        <b-form-input v-model="newDevice.price" placeholder="Price" type="number" required></b-form-input>
-        <b-form-checkbox v-model="newDevice.active">Active</b-form-checkbox>
-        <b-form-input v-model="newDevice.description" placeholder="Description" required></b-form-input>
-        <b-form-input v-model="newDevice.brand" placeholder="Brand" required></b-form-input>
-        <b-form-input v-model="newDevice.model" placeholder="Model" required></b-form-input>
-        <b-form-input v-model="newDevice.serial_no" placeholder="Serial Number" required></b-form-input>
-        <b-form-input v-model="newDevice.qr_code" placeholder="QR Code" required></b-form-input>
-        <!-- Dropdown menu for categories -->
-        <b-form-select v-model="newDevice.category_id" :options="categoryOptions" required></b-form-select>
+        <div class="form-group">
+          <label for="owner">Owner:</label>
+          <b-form-input id="owner" v-model="newDevice.owner"  required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="date_of_purchase">Purchase Date:</label>
+          <b-form-input id="date_of_purchase" v-model="newDevice.date_of_purchase"  required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="purchase_price">Purchase Price:</label>
+          <b-form-input id="purchase_price" v-model="newDevice.purchase_price"  type="number" required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="rent_price_per_hour">Rent Price per Hour:</label>
+          <b-form-input id="rent_price_per_hour" v-model="newDevice.rent_price_per_hour" type="number" required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <b-form-checkbox v-model="newDevice.active">Active</b-form-checkbox>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <b-form-input id="description" v-model="newDevice.description"  required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">Brand:</label>
+          <b-form-input id="brand" v-model="newDevice.brand" required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="model">Model:</label>
+          <b-form-input id="model" v-model="newDevice.model" required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="serial_no">Serial Number:</label>
+          <b-form-input id="serial_no" v-model="newDevice.serial_no" required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="qr_code">QR Code:</label>
+          <b-form-input id="qr_code" v-model="newDevice.qr_code"  required></b-form-input>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category:</label>
+          <!-- Dropdown menu for categories -->
+          <b-form-select id="category" v-model="newDevice.category_id" :options="categoryOptions" required></b-form-select>
+        </div>
       </b-modal>
+
 
       <!-- Modal for editing device details -->
       <b-modal id="edit-modal" v-model="isEditModalVisible" title="Edit Device" @ok="saveDevice">
         <b-form-input v-model="editableDevice.owner" placeholder="Owner" required></b-form-input>
         <b-form-input v-model="editableDevice.date_of_purchase" placeholder="Purchase Date" required></b-form-input>
-        <b-form-input v-model="editableDevice.price" placeholder="Price" type="number" required></b-form-input>
+        <b-form-input v-model="editableDevice.purchase_price" placeholder="Price" type="number" required></b-form-input>
+        <b-form-input v-model="editableDevice.rent_price_per_hour" placeholder="Price" type="number" required></b-form-input>
         <b-form-checkbox v-model="editableDevice.active">Active</b-form-checkbox>
         <b-form-input v-model="editableDevice.description" placeholder="Description" required></b-form-input>
         <b-form-input v-model="editableDevice.brand" placeholder="Brand" required></b-form-input>
@@ -67,7 +112,8 @@ interface Device {
   id: number;
   owner: string;
   date_of_purchase: string;
-  price: number;
+  purchase_price: number;
+  rent_price_per_hour: number;
   active: boolean;
   description: string;
   brand: string;
@@ -88,7 +134,8 @@ export default defineComponent({
       id: 0,
       owner: '',
       date_of_purchase: '',
-      price: 0,
+      purchase_price: 0,
+      rent_price_per_hour: 0,
       active: false,
       description: '',
       brand: '',
@@ -100,7 +147,8 @@ export default defineComponent({
     const newDevice = ({
       owner: '',
       date_of_purchase: '',
-      price: 0,
+      purchase_price: 0,
+      rent_price_per_hour: 0,
       active: false,
       description: '',
       brand: '',
@@ -180,7 +228,8 @@ export default defineComponent({
         id: 0,
         owner: '',
         date_of_purchase: '',
-        price: 0,
+        rent_price_per_hour: 0,
+        purchase_price: 0,
         active: false,
         description: '',
         brand: '',
@@ -206,14 +255,12 @@ export default defineComponent({
     const fields = [
       { key: 'owner', label: 'Owner' },
       { key: 'date_of_purchase', label: 'Purchase Date' },
-      { key: 'price', label: 'Price' },
-      { key: 'active', label: 'Active' },
       { key: 'description', label: 'Description' },
       { key: 'brand', label: 'Brand' },
       { key: 'model', label: 'Model' },
       { key: 'serial_no', label: 'Serial Number' },
       { key: 'qr_code', label: 'QR Code' },
-      { key: 'category_id', label: 'Category' }, // Anzeigen der Kategorie-ID
+      { key: 'category_id', label: 'Category' },
       { key: 'edit', label: 'Edit', sortable: false },
       { key: 'delete', label: 'Delete', sortable: false }
     ];

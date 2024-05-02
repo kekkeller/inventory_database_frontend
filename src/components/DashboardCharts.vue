@@ -105,7 +105,7 @@ const loadRevenueData = async () => {
 
     bookings.forEach(booking => {
       const month = new Date(booking.time_start).getMonth();
-      const revenue = booking.price;
+      const revenue = booking.booking_price;
 
       if (!revenueByMonth[month]) {
         revenueByMonth[month] = revenue;

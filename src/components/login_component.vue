@@ -25,7 +25,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import { BaseLabel } from "@apiida/vue-components";
 import {useLoggedIn} from "../composable/useLoggedIn";
 

@@ -4,7 +4,8 @@
     <h1 class="text-2xl mb-8"></h1>
     <b-table striped hover :items="bookings" :fields="fields" class="w-full">
       <template #cell(actions)="{ item }">
-        <b-button variant="secondary" @click="showDetails(item)">Details</b-button>
+        <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">Details</b-button>
+        <b-button variant="danger" v-if="item.active" @click="showCloseBookingModal(item)">Close Booking</b-button>
       </template>
       <template #cell(time_start)="data">
         {{ formatDateTime(data.item.time_start) }}
@@ -21,12 +22,17 @@
       <template v-if="selectedItem">
         <p><strong>Start Time:</strong> {{ formatDateTime(selectedItem.time_start) }}</p>
         <p><strong>End Time:</strong> {{ formatDateTime(selectedItem.time_end) }}</p>
-        <p><strong>Price:</strong> {{ selectedItem.price }}</p>
+        <p><strong>Price:</strong> {{ selectedItem.booking_price }}</p>
         <p><strong>Device Model:</strong> {{ deviceMap[selectedItem.device_id] }}</p>
         <p><strong>User ID:</strong> {{ selectedItem.user_id }}</p>
+        <p><strong>Active:</strong> {{ selectedItem.active }}</p>
         <p><strong>Rent Charge:</strong> {{ selectedItem.rent_charge }}</p>
         <p><strong>PIN:</strong> {{ selectedItem.pin }}</p>
       </template>
+    </b-modal>
+    <!-- Modal for confirming booking closure -->
+    <b-modal id="close-booking-modal" v-model="isCloseBookingModalVisible" title="Confirm Closure" @ok="closeBooking">
+      Are you sure you want to close this booking?
     </b-modal>
   </div>
 </template>
@@ -39,7 +45,7 @@ interface Booking {
   time_start: string;
   time_end: string;
   active: boolean;
-  price: number;
+  booking_price: number;
   device_id: number;
   user_id: number;
   rent_charge: string;
@@ -59,11 +65,17 @@ export default defineComponent({
     const selectedItem = ref<Booking | null>(null);
     const userId = Number(sessionStorage.getItem('userId'));
     const deviceMap = ref<Record<number, string>>({});
+    const isCloseBookingModalVisible = ref(false);
+
+    const showCloseBookingModal = (item: Booking) => {
+      selectedItem.value = item;
+      isCloseBookingModalVisible.value = true;
+    };
 
     const fields = [
       { key: 'time_start', label: 'Start Time' },
-      { key: 'time_end', label: 'End Time' },
-      { key: 'price', label: 'Price' },
+      // { key: 'time_end', label: 'End Time' },
+      // { key: 'booking_price', label: 'Price' },
       { key: 'device_id', label: 'Device Model' },
       { key: 'actions', label: 'Actions', sortable: false }
     ];
@@ -105,6 +117,18 @@ export default defineComponent({
       return date.toLocaleString();
     };
 
+    const closeBooking = async () => {
+      if (selectedItem.value && selectedItem.value.active) {
+        try {
+          // await axios.put(`/api/bookings/close/${selectedItem.value.id}`);
+          selectedItem.value.active = false;  // Set the booking to inactive
+          isCloseBookingModalVisible.value = false;
+        } catch (error) {
+          console.error('Failed to close booking:', error);
+        }
+      }
+    };
+
     onMounted(() => {
       fetchBookings();
     });
@@ -116,7 +140,10 @@ export default defineComponent({
       isModalVisible,
       selectedItem,
       formatDateTime,
-      deviceMap
+      deviceMap,
+      isCloseBookingModalVisible,
+      showCloseBookingModal,
+      closeBooking
     };
   }
 });

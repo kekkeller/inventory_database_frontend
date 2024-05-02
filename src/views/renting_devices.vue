@@ -15,6 +15,7 @@
           <p><b>Description:</b> {{ selectedItem.description }}</p>
           <p><b>Brand:</b> {{ selectedItem.brand }}</p>
           <p><b>Model:</b> {{ selectedItem.model }}</p>
+          <p><b>Price per Hour:</b> {{ selectedItem.rent_price_per_hour }}</p>
           <p><b>QR Code:</b> {{ selectedItem.qr_code }}</p>
         </template>
       </b-modal>
@@ -33,7 +34,7 @@ interface Device {
   id: number;
   owner: string;
   date_of_purchase: string;
-  price: number;
+  rent_price_per_hour: number;
   active: boolean;
   description: string;
   brand: string;
@@ -53,7 +54,7 @@ export default defineComponent({
       id: 0,
       owner: '',
       date_of_purchase: '',
-      price: 0,
+      rent_price_per_hour: 0,
       active: false,
       description: '',
       brand: '',
@@ -75,6 +76,7 @@ export default defineComponent({
       { key: 'category_id', label: 'Category'},
       { key: 'model', label: 'Model' },
       { key: 'brand', label: 'Brand' },
+      { key: 'rent_price_per_hour', label: 'Price per Hour' },
       { key: 'rent', label: '', sortable: false },
     ];
 
@@ -108,14 +110,14 @@ export default defineComponent({
           time_start: getCurrentDateTime(),
           time_end: getCurrentDateTime(),
           active: true,
-          price: item.price / 100,
+          booking_price: item.rent_price_per_hour,
           device_id: item.id,
           user_id: userIdNumber,
           rent_charge: 'rent',
           pin: 0
         };
         console.log(bookingData);
-        // await axios.post('/api/bookings', bookingData);
+        await axios.post('/api/bookings', bookingData);
         // Optional: Do something after successful booking
         console.log('Device rented successfully:', item);
       } catch (error) {

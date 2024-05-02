@@ -15,7 +15,7 @@ interface Rental {
   time_start: string;
   time_end: string;
   active: boolean;
-  price: number;
+  booking_price: number;
   device_id: number;
   user_id: number;
   rent_charge: string;
@@ -29,7 +29,7 @@ export default defineComponent({
       { key: 'time_start', label: 'Start Time', formatter: (value) => new Date(value).toLocaleString() },
       { key: 'time_end', label: 'End Time', formatter: (value) => new Date(value).toLocaleString() },
       { key: 'active', label: 'Active', formatter: (value) => value ? 'Yes' : 'No' },
-      { key: 'price', label: 'Price' },
+      { key: 'booking_price', label: 'Price' },
       { key: 'device_id', label: 'Device ID' },
       { key: 'user_id', label: 'User ID' },
       { key: 'rent_charge', label: 'Rent Charge' }
