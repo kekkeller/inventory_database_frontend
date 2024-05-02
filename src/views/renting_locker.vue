@@ -117,7 +117,7 @@ export default defineComponent({
           booking_price: item.rent_price_per_hour,
           device_id: item.id,
           user_id: userIdNumber,
-          rent_charge: 'rent',
+          rent_charge: 'charge',
           pin: 0
         };
         console.log(bookingData);

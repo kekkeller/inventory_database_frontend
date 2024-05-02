@@ -1,11 +1,13 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
     <h3 class="text-left">Renting Device</h3>
-    <h1 class="text-2xl mb-8"></h1>
     <b-table striped hover :items="bookings" :fields="fields" class="w-full">
       <template #cell(actions)="{ item }">
         <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">Details</b-button>
         <b-button variant="danger" v-if="item.active" @click="showCloseBookingModal(item)">Close Booking</b-button>
+      </template>
+      <template #cell(charge)="{ item }">
+        <b-button variant="secondary" v-if="item.active && item.rent_charge === 'charge'" @click="showVoltageModal">Charge Info</b-button>
       </template>
       <template #cell(time_start)="data">
         {{ formatDateTime(data.item.time_start) }}
@@ -29,9 +31,16 @@
         <p><strong>PIN:</strong> {{ selectedItem.pin }}</p>
       </template>
     </b-modal>
-    <!-- Modal for confirming booking closure -->
+
     <b-modal id="close-booking-modal" v-model="isCloseBookingModalVisible" title="Confirm Closure" @ok="closeBooking">
       Are you sure you want to close this booking?
+    </b-modal>
+
+    <b-modal id="voltage-modal" v-model="isVoltageModalVisible" title="Voltage Information" size="lg" ok-only ok-title="Close">
+      <div class="d-flex justify-content-center align-items-center pt-10">
+        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2530450/widgets/852176"></iframe>
+        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2530450/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=History+of+Wattage&type=line"></iframe>
+      </div>
     </b-modal>
   </div>
 </template>
@@ -62,31 +71,24 @@ export default defineComponent({
   setup() {
     const bookings = ref<Booking[]>([]);
     const isModalVisible = ref(false);
-    const devices = ref<Record<number, Device>>({});
+    const isVoltageModalVisible = ref(false);
     const selectedItem = ref<Booking | null>(null);
-    const userId = Number(sessionStorage.getItem('userId'));
-    const deviceMap = ref<Record<number, string>>({});
     const isCloseBookingModalVisible = ref(false);
-
-    const showCloseBookingModal = (item: Booking) => {
-      selectedItem.value = item;
-      isCloseBookingModalVisible.value = true;
-    };
+    const deviceMap = ref<Record<number, string>>({});
 
     const fields = [
       { key: 'time_start', label: 'Start Time' },
-      // { key: 'time_end', label: 'End Time' },
-      // { key: 'booking_price', label: 'Price' },
+      { key: 'time_end', label: 'End Time' },
       { key: 'device_id', label: 'Device Model' },
-      { key: 'actions', label: 'Actions', sortable: false }
+      { key: 'actions', label: 'Actions', sortable: false },
+      { key: 'charge', label: '', sortable: false }
     ];
 
     const fetchBookings = async () => {
       try {
+        const userId = Number(sessionStorage.getItem('userId'));
         const response = await axios.get(`/api/bookings/allbyUserID/${userId}`);
         bookings.value = response.data;
-
-        // Fetch device details for each booking and create a device map
         const deviceIds = bookings.value.map(booking => booking.device_id);
         await fetchDeviceDetails(deviceIds);
       } catch (error) {
@@ -97,8 +99,7 @@ export default defineComponent({
     const fetchDeviceDetails = async (deviceIds: number[]) => {
       const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
       response.data.forEach((device: Device) => {
-        devices.value[device.id] = device;
-        deviceMap.value[device.id] = device.model; // Update deviceMap immediately after fetching
+        deviceMap.value[device.id] = device.model;
       });
     };
 
@@ -107,47 +108,34 @@ export default defineComponent({
       isModalVisible.value = true;
     };
 
-    function getCurrentDateTime() {
-      const date = new Date();
-      return date.toISOString().slice(0, 19).replace('T', ' ');
-    }
+    const showCloseBookingModal = (item: Booking) => {
+      selectedItem.value = item;
+      isCloseBookingModalVisible.value = true;
+    };
+
+    const showVoltageModal = () => {
+      isVoltageModalVisible.value = true;
+    };
+
+    const closeBooking = async () => {
+      try {
+        if (selectedItem.value) {
+          const updatedBooking = { ...selectedItem.value, active: false, time_end: new Date().toISOString() };
+          await axios.put(`/api/bookings/${selectedItem.value.id}`, updatedBooking);
+          isCloseBookingModalVisible.value = false;
+          await fetchBookings();
+        }
+      } catch (error) {
+        console.error('Failed to close booking:', error);
+      }
+    };
 
     const formatDateTime = (dateTime: string) => {
       const date = new Date(dateTime);
       return date.toLocaleString();
     };
 
-    const closeBooking = async () => {
-      if (selectedItem.value && selectedItem.value.active) {
-        try {
-          const endTime = new Date();
-          const startTime = new Date(selectedItem.value.time_start);
-          const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-          const device = devices.value[selectedItem.value.device_id];
-
-          const bookingPrice = durationHours * device.rent_price_per_hour;
-
-          const updatedBooking = {
-            ...selectedItem.value,
-            time_end: endTime.toISOString(),
-            active: false,
-            booking_price: bookingPrice.toFixed(2)
-          };
-
-          await axios.put(`/api/bookings/${selectedItem.value.id}`, updatedBooking);
-          isCloseBookingModalVisible.value = false;
-          await fetchBookings();
-        } catch (error) {
-          console.error('Failed to close booking:', error);
-        }
-      }
-    };
-
-
-
-    onMounted(() => {
-      fetchBookings();
-    });
+    onMounted(fetchBookings);
 
     return {
       bookings,
@@ -156,10 +144,12 @@ export default defineComponent({
       isModalVisible,
       selectedItem,
       formatDateTime,
-      deviceMap,
       isCloseBookingModalVisible,
       showCloseBookingModal,
-      closeBooking
+      closeBooking,
+      deviceMap,
+      isVoltageModalVisible,
+      showVoltageModal
     };
   }
 });
