@@ -7,20 +7,12 @@
           <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
         </template>
       </b-table>
-
-      <!-- Modal for displaying device details -->
       <b-modal id="details-modal" v-model="isModalVisible" title="Device Details" ok-only ok-title="Close">
         <template v-if="selectedItem">
-          <p><b>Owner:</b> {{ selectedItem.owner }}</p>
-          <p><b>Date of Purchase:</b> {{ selectedItem.date_of_purchase }}</p>
-          <p><b>Price:</b> {{ selectedItem.price }}</p>
-          <p><b>Active:</b> {{ selectedItem.active }}</p>
+          <p><b>Location:</b> {{ selectedItem.owner }}</p>
           <p><b>Description:</b> {{ selectedItem.description }}</p>
           <p><b>Brand:</b> {{ selectedItem.brand }}</p>
           <p><b>Model:</b> {{ selectedItem.model }}</p>
-          <p><b>Serial Number:</b> {{ selectedItem.serial_no }}</p>
-          <p><b>QR Code:</b> {{ selectedItem.qr_code }}</p>
-          <p><b>Category:</b> {{ getCategoryName(selectedItem.category_id) }}</p>
         </template>
       </b-modal>
     </div>
@@ -54,11 +46,8 @@ export default defineComponent({
     const categories = ref<any[]>([]);
 
     const fields = [
-      { key: 'price', label: 'Price' },
-      { key: 'active', label: 'Active' },
-      { key: 'brand', label: 'Brand' },
-      { key: 'model', label: 'Model' },
-      { key: 'category_id', label: 'Category' },
+      { key: 'model', label: 'Location' },
+      { key: 'description', label: 'Description' },
       { key: 'edit', label: 'Details', sortable: false },
     ];
 

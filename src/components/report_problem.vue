@@ -40,6 +40,13 @@ interface Booking {
 export default defineComponent({
   name: 'ReportProblem',
   setup() {
+
+    function getCurrentDateTime() {
+      const date = new Date();
+      return date.toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+
     const formRef = ref<HTMLFormElement | null>(null);
     const report = ref<Report>({
       date: '',
@@ -50,9 +57,7 @@ export default defineComponent({
     const submitted = ref(false);
     const bookings = ref<Booking[]>([]);
 
-    const getCurrentDateTime = (): string => {
-      return new Date().toISOString();
-    };
+
 
     const submitReport = async () => {
       if (!report.value.description || !report.value.image || !report.value.booking_id) {
