@@ -22,6 +22,16 @@
       <b-modal id="confirmation-modal" v-model="isConfirmationVisible" title="Confirm Booking" ok-title="Confirm" cancel-title="Cancel" @ok="rentDevice(selectedDevice)">
         Are you sure you want to book this device?
       </b-modal>
+      <b-modal
+          id="pin-display-modal"
+          v-model="isPinDisplayVisible"
+          title="Booking Confirmed"
+          ok-only
+          @ok="isPinDisplayVisible = false">
+        <p>Your booking is confirmed. Here is your PIN:</p>
+        <h4>{{ bookingPin }}</h4>
+<!--        <img src="" alt="Map" class="img-fluid">-->
+      </b-modal>
     </div>
   </div>
 </template>
@@ -49,7 +59,9 @@ export default defineComponent({
   setup() {
     const devices = ref<Device[]>([]);
     const isModalVisible = ref(false);
+    const isPinDisplayVisible = ref(false);
     const selectedItem = ref<Device | null>(null);
+    const bookingPin = ref('');
     const selectedDevice = ref<Device>({
       id: 0,
       owner: '',
@@ -117,8 +129,9 @@ export default defineComponent({
           pin: 0
         };
         console.log(bookingData);
-        await axios.post('/api/bookings', bookingData);
-        // Optional: Do something after successful booking
+        await axios.post('/api/bookings', bookingData).then(response => { bookingPin.value = response.data.pin});
+        isPinDisplayVisible.value = true;
+        await loadDevices();
         console.log('Device rented successfully:', item);
       } catch (error) {
         console.error('Error renting device:', error);
@@ -155,7 +168,9 @@ export default defineComponent({
       showDeviceDetails,
       rentDevice,
       confirmBooking,
-      isConfirmationVisible
+      isConfirmationVisible,
+      isPinDisplayVisible,
+      bookingPin
     };
   },
 });

@@ -24,7 +24,6 @@
         <p><strong>End Time:</strong> {{ formatDateTime(selectedItem.time_end) }}</p>
         <p><strong>Price:</strong> {{ selectedItem.booking_price }}</p>
         <p><strong>Device Model:</strong> {{ deviceMap[selectedItem.device_id] }}</p>
-        <p><strong>User ID:</strong> {{ selectedItem.user_id }}</p>
         <p><strong>Active:</strong> {{ selectedItem.active }}</p>
         <p><strong>Rent Charge:</strong> {{ selectedItem.rent_charge }}</p>
         <p><strong>PIN:</strong> {{ selectedItem.pin }}</p>
