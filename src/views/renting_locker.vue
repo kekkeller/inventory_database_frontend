@@ -1,25 +1,37 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
-    <div>
-      <h3 class="text-left">Rent Device</h3>
-      <b-table striped hover :items="devices" :fields="fields" class="w-full">
-        <template #cell(edit)="data">
-          <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
-        </template>
-        <template #cell(rent)="data">
-          <b-button variant="success" @click="confirmBooking(data.item)">Rent Me</b-button>
-        </template>
-      </b-table>
-      <b-modal id="confirmation-modal" v-model="isConfirmationVisible" title="Confirm Booking" ok-title="Confirm" cancel-title="Cancel" @ok="rentDevice(selectedDevice)">
-        Are you sure you want to book this device?
-      </b-modal>
-    </div>
+    <h3 class="text-left">Rent Device</h3>
+    <b-table striped hover :items="devices" :fields="fields" class="w-full">
+      <template #cell(edit)="data">
+        <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
+      </template>
+      <template #cell(rent)="data">
+        <b-button variant="success" @click="confirmBooking(data.item)">Rent Me</b-button>
+      </template>
+    </b-table>
+    <!-- Confirmation Modal for renting devices -->
+    <b-modal id="confirmation-modal" v-model="isConfirmationVisible" title="Confirm Booking" ok-title="Confirm" cancel-title="Cancel" @ok="rentDevice(selectedDevice)">
+      Are you sure you want to book this device?
+    </b-modal>
+    <!-- PIN Display Modal -->
+    <b-modal
+      id="pin-display-modal"
+      v-model="isPinDisplayVisible"
+      title="Booking Confirmed"
+      ok-only
+      @ok="isPinDisplayVisible = false">
+    <p>Your booking is confirmed. Here is your PIN:</p>
+    <h4>{{ bookingPin }}</h4>
+    <img :src="mapImage" alt="Map" class="img-fluid">
+  </b-modal>
   </div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
+const mapImage = new URL('../assets/map.JPG', import.meta.url).href;
 
 interface Device {
   id: number;
@@ -41,6 +53,8 @@ export default defineComponent({
     const devices = ref<Device[]>([]);
     const isModalVisible = ref(false);
     const selectedItem = ref<Device | null>(null);
+    const bookingPin = ref('');
+    const isPinDisplayVisible = ref(false);
     const selectedDevice = ref<Device>({
       id: 0,
       owner: '',
@@ -107,9 +121,10 @@ export default defineComponent({
           pin: 0
         };
         console.log(bookingData);
-        await axios.post('/api/bookings', bookingData);
-        // Optional: Do something after successful booking
+        await axios.post('/api/bookings', bookingData).then(response => { bookingPin.value = response.data.pin});
         console.log('Device rented successfully:', item);
+        isPinDisplayVisible.value = true;
+        await loadDevices();
       } catch (error) {
         console.error('Error renting device:', error);
       }
@@ -145,7 +160,10 @@ export default defineComponent({
       showDeviceDetails,
       rentDevice,
       confirmBooking,
-      isConfirmationVisible
+      isConfirmationVisible,
+      bookingPin,
+      isPinDisplayVisible,
+      mapImage
     };
   },
 });

@@ -96,14 +96,11 @@ export default defineComponent({
     };
 
     const fetchDeviceDetails = async (deviceIds: number[]) => {
-      try {
-        const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
-        response.data.forEach((device: Device) => {
-          devices.value[device.id] = device;
-        });
-      } catch (error) {
-        console.error('Failed to fetch device details:', error);
-      }
+      const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
+      response.data.forEach((device: Device) => {
+        devices.value[device.id] = device;
+        deviceMap.value[device.id] = device.model; // Update deviceMap immediately after fetching
+      });
     };
 
     const showDetails = (item: Booking) => {
