@@ -32,10 +32,12 @@
           </div>
         </div>
         <div class="flex items-center">
-          <!-- Logout Button -->
-          <button @click="logout" class="logout-btn">
-            Logout
-          </button>
+          <b-button variant="danger" class="logout-btn" @click="logout">
+            <div class="d-flex align-items-center justify-content-center">
+              <BIconBoxArrowLeft></BIconBoxArrowLeft>
+              <span class="ml-2">Logout</span>
+            </div>
+          </b-button>
         </div>
       </div>
     </div>
@@ -48,6 +50,8 @@ import { useRouter } from 'vue-router';
 import {useLoggedIn} from "@/composable/useLoggedIn";
 
 export default defineComponent({
+  components: {
+  },
   setup() {
     const router = useRouter();
     const {setLoggedIn} = useLoggedIn();
@@ -62,7 +66,9 @@ export default defineComponent({
 
     return { logout, logoImageUrl };
   }
+
 });
+
 </script>
 
 <style scoped>

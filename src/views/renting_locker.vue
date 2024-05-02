@@ -6,7 +6,12 @@
         <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
       </template>
       <template #cell(rent)="data">
-        <b-button variant="success" @click="confirmBooking(data.item)">Rent Me</b-button>
+        <b-button variant="success" @click="confirmBooking(data.item)">
+          <div class="d-flex align-items-center justify-content-center">
+            <BIconDoorOpen></BIconDoorOpen>
+            <span class="ml-2">Rent Me</span>
+          </div>
+        </b-button>
       </template>
     </b-table>
     <!-- Confirmation Modal for renting devices -->

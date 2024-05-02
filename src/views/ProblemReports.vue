@@ -3,7 +3,12 @@
     <h3 class="text-left">Problem Reports</h3>
     <b-table :items="reports" :fields="fields" class="w-full">
       <template #cell(view)="data">
-        <b-button variant="info" @click="viewReport(data.item)">View</b-button>
+        <b-button variant="info" @click="viewReport(data.item)">
+          <div class="d-flex align-items-center justify-content-center buttonsize">
+            <BIconInfoCircle></BIconInfoCircle>
+            <span class="ml-2">Details</span>
+          </div>
+          </b-button>
       </template>
     </b-table>
     <!-- Modal for viewing reports -->
@@ -47,7 +52,7 @@ export default defineComponent({
     const fields = [
       { key: 'date', label: 'Date' },
       { key: 'description', label: 'Description' },
-      { key: 'view', label: 'View', sortable: false },
+      { key: 'view', label: '', sortable: false },
     ];
 
     const loadReports = async () => {

@@ -3,11 +3,26 @@
     <h3 class="text-left">Renting Device</h3>
     <b-table striped hover :items="bookings" :fields="fields" class="w-full">
       <template #cell(actions)="{ item }">
-        <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">Details</b-button>
-        <b-button variant="danger" v-if="item.active" @click="showCloseBookingModal(item)">Close Booking</b-button>
+        <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">
+          <div class="d-flex align-items-center justify-content-center buttonsize">
+            <BIconInfoCircle></BIconInfoCircle>
+            <span class="ml-2">Details</span>
+          </div>
+        </b-button>
+        <b-button variant="danger" v-if="item.active" @click="showCloseBookingModal(item)">
+          <div class="d-flex align-items-center justify-content-center buttonsize">
+            <BIconXCircle></BIconXCircle>
+            <span class="ml-2">Close Booking</span>
+          </div>
+        </b-button>
       </template>
       <template #cell(charge)="{ item }">
-        <b-button variant="secondary" v-if="item.active && item.rent_charge === 'charge'" @click="showVoltageModal">Charge Info</b-button>
+        <b-button variant="warning" v-if="item.active && item.rent_charge === 'charge'" @click="showVoltageModal">
+          <div class="d-flex align-items-center justify-content-center">
+            <BIconLightning></BIconLightning>
+            <span class="ml-2">Charging Info</span>
+          </div>
+        </b-button>
       </template>
       <template #cell(time_start)="data">
         {{ formatDateTime(data.item.time_start) }}
@@ -86,8 +101,8 @@ export default defineComponent({
       { key: 'time_end', label: 'End Time' },
       { key: 'device_id', label: 'Device Model' },
       { key: 'booking_price', label: 'Booking Price'  },
-      { key: 'actions', label: 'Actions', sortable: false },
-      { key: 'charge', label: '', sortable: false }
+      { key: 'charge', label: '', sortable: false },
+      { key: 'actions', label: 'Actions', sortable: false }
     ];
 
     const fetchBookings = async () => {
@@ -160,3 +175,9 @@ export default defineComponent({
   }
 });
 </script>
+<style scoped>
+.buttonsize{
+  width: 10rem;
+}
+</style>
+
