@@ -3,6 +3,9 @@
     <div>
       <h3 class="text-left">Rent Device</h3>
       <b-table striped hover :items="devices" :fields="fields" class="w-full">
+        <template #cell(image)="data">
+          <img :src="data.item.image" alt="Device Image" class="img-fluid" style="width: 100px; height: auto; cursor: pointer;" @click="showLargeImage(data.item.image)">
+        </template>
         <template #cell(edit)="data">
           <b-button variant="primary" @click="showDeviceDetails(data.item)">Details</b-button>
         </template>
@@ -17,20 +20,18 @@
           <p><b>Model:</b> {{ selectedItem.model }}</p>
           <p><b>Price per Hour:</b> {{ selectedItem.rent_price_per_hour }}</p>
           <p><b>QR Code:</b> {{ selectedItem.qr_code }}</p>
+          <img :src="selectedItem.image" alt="Selected Device Image" class="img-fluid">
         </template>
       </b-modal>
       <b-modal id="confirmation-modal" v-model="isConfirmationVisible" title="Confirm Booking" ok-title="Confirm" cancel-title="Cancel" @ok="rentDevice(selectedDevice)">
         Are you sure you want to book this device?
       </b-modal>
-      <b-modal
-          id="pin-display-modal"
-          v-model="isPinDisplayVisible"
-          title="Booking Confirmed"
-          ok-only
-          @ok="isPinDisplayVisible = false">
+      <b-modal id="pin-display-modal" v-model="isPinDisplayVisible" title="Booking Confirmed" ok-only @ok="isPinDisplayVisible = false">
         <p>Your booking is confirmed. Here is your PIN:</p>
         <h4>{{ bookingPin }}</h4>
-<!--        <img src="" alt="Map" class="img-fluid">-->
+      </b-modal>
+      <b-modal id="image-modal" v-model="isImageModalVisible" title="View Image" size="lg" ok-only ok-title="Close">
+        <img :src="largeImageUrl" alt="Large Device Image" class="img-fluid">
       </b-modal>
     </div>
   </div>
@@ -52,6 +53,7 @@ interface Device {
   serial_no: string;
   qr_code: string;
   category_id: number;
+  image: string;
 }
 
 export default defineComponent({
@@ -59,6 +61,8 @@ export default defineComponent({
   setup() {
     const devices = ref<Device[]>([]);
     const isModalVisible = ref(false);
+    const isImageModalVisible = ref(false);
+    const largeImageUrl = ref('');
     const isPinDisplayVisible = ref(false);
     const selectedItem = ref<Device | null>(null);
     const bookingPin = ref('');
@@ -73,9 +77,9 @@ export default defineComponent({
       model: '',
       serial_no: '',
       qr_code: '',
-      category_id: 0
+      category_id: 0,
+      image: ''
     });
-
     const isConfirmationVisible = ref(false);
     const categories = ref<any[]>([]);
 
@@ -85,6 +89,7 @@ export default defineComponent({
     }
 
     const fields = [
+      { key: 'image', label: '' },
       { key: 'category_id', label: 'Category'},
       { key: 'model', label: 'Model' },
       { key: 'brand', label: 'Brand' },
@@ -112,12 +117,11 @@ export default defineComponent({
         console.error('Failed to fetch categories:', error);
       }
     };
+
     const rentDevice = async (item: Device) => {
       try {
         const userId = sessionStorage.getItem('userId');
-
         const userIdNumber = userId ? parseInt(userId) : 0;
-
         const bookingData = {
           time_start: getCurrentDateTime(),
           time_end: getCurrentDateTime(),
@@ -153,6 +157,11 @@ export default defineComponent({
       isConfirmationVisible.value = true;
     };
 
+    const showLargeImage = (imageUrl: string) => {
+      largeImageUrl.value = imageUrl;
+      isImageModalVisible.value = true;
+    };
+
     onMounted(async () => {
       await loadCategories();
       await loadDevices();
@@ -170,7 +179,10 @@ export default defineComponent({
       confirmBooking,
       isConfirmationVisible,
       isPinDisplayVisible,
-      bookingPin
+      bookingPin,
+      isImageModalVisible,
+      largeImageUrl,
+      showLargeImage
     };
   },
 });
