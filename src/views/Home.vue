@@ -56,12 +56,14 @@ interface Booking {
 interface Device {
   id: number;
   model: string;
+  rent_price_per_hour: number;
 }
 
 export default defineComponent({
   setup() {
     const bookings = ref<Booking[]>([]);
     const isModalVisible = ref(false);
+    const devices = ref<Record<number, Device>>({});
     const selectedItem = ref<Booking | null>(null);
     const userId = Number(sessionStorage.getItem('userId'));
     const deviceMap = ref<Record<number, string>>({});
@@ -95,12 +97,9 @@ export default defineComponent({
 
     const fetchDeviceDetails = async (deviceIds: number[]) => {
       try {
-        const response = await axios.get(`/api/devices?deviceIds=${deviceIds.join(',')}`);
-        const devices = response.data as Device[];
-
-        // Create a map of device IDs to device models
-        devices.forEach(device => {
-          deviceMap.value[device.id] = device.model;
+        const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
+        response.data.forEach((device: Device) => {
+          devices.value[device.id] = device;
         });
       } catch (error) {
         console.error('Failed to fetch device details:', error);
@@ -112,6 +111,11 @@ export default defineComponent({
       isModalVisible.value = true;
     };
 
+    function getCurrentDateTime() {
+      const date = new Date();
+      return date.toISOString().slice(0, 19).replace('T', ' ');
+    }
+
     const formatDateTime = (dateTime: string) => {
       const date = new Date(dateTime);
       return date.toLocaleString();
@@ -120,14 +124,30 @@ export default defineComponent({
     const closeBooking = async () => {
       if (selectedItem.value && selectedItem.value.active) {
         try {
-          // await axios.put(`/api/bookings/close/${selectedItem.value.id}`);
-          selectedItem.value.active = false;  // Set the booking to inactive
+          const endTime = new Date();
+          const startTime = new Date(selectedItem.value.time_start);
+          const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+          const device = devices.value[selectedItem.value.device_id];
+
+          const bookingPrice = durationHours * device.rent_price_per_hour;
+
+          const updatedBooking = {
+            ...selectedItem.value,
+            time_end: endTime.toISOString(),
+            active: false,
+            booking_price: bookingPrice.toFixed(2)
+          };
+
+          await axios.put(`/api/bookings/${selectedItem.value.id}`, updatedBooking);
           isCloseBookingModalVisible.value = false;
+          await fetchBookings();
         } catch (error) {
           console.error('Failed to close booking:', error);
         }
       }
     };
+
+
 
     onMounted(() => {
       fetchBookings();

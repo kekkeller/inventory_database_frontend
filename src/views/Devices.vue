@@ -23,7 +23,7 @@
 
         <div class="form-group">
           <label for="date_of_purchase">Purchase Date:</label>
-          <b-form-input id="date_of_purchase" v-model="newDevice.date_of_purchase"  required></b-form-input>
+          <b-form-input id="date_of_purchase" v-model="newDevice.date_of_purchase"  ></b-form-input>
         </div>
 
         <div class="form-group">

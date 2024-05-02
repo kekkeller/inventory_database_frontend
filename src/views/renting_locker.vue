@@ -72,7 +72,7 @@ export default defineComponent({
 
     const loadDevices = async () => {
       try {
-        const response = await axios.get('/api/devices');
+        const response = await axios.get('/api/devices/unused');
         devices.value = response.data.filter((device: Device) => device.brand === 'Locker').map((device: Device) => ({
           ...device,
           category_id: getCategoryName(device.category_id)
