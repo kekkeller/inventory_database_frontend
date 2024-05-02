@@ -26,8 +26,16 @@
       ok-only
       @ok="isPinDisplayVisible = false">
     <p>Your booking is confirmed. Here is your PIN:</p>
-    <h4>{{ bookingPin }}</h4>
-    <img :src="mapImage" alt="Map" class="img-fluid">
+      <div class="pin-container pb-2">
+        <div v-for="(digit) in pinDigits" class="pin-digit">
+          {{ digit }}
+        </div>
+      </div>
+<!--      <h3>{{ bookingPin }}</h3>-->
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2571.677878723729!2d8.635615477107361!3d49.86729527148667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47bd70834660fbb1%3A0xc6acb1a957e2bba0!2sHochschule%20Darmstadt!5e0!3m2!1sde!2sde!4v1714685002721!5m2!1sde!2sde" width="400" height="450" style="border:0;"  loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
   </b-modal>
   </div>
 </template>
@@ -53,12 +61,14 @@ interface Device {
 }
 
 export default defineComponent({
+  methods: {},
   components: {},
   setup() {
     const devices = ref<Device[]>([]);
     const isModalVisible = ref(false);
     const selectedItem = ref<Device | null>(null);
     const bookingPin = ref('');
+    const pinDigits = ref(["1","2","3","4"]);
     const isPinDisplayVisible = ref(false);
     const selectedDevice = ref<Device>({
       id: 0,
@@ -126,7 +136,9 @@ export default defineComponent({
           pin: 0
         };
         console.log(bookingData);
-        await axios.post('/api/bookings', bookingData).then(response => { bookingPin.value = response.data.pin});
+        await axios.post('/api/bookings', bookingData).then(response => { bookingPin.value = response.data.pin });
+        pinDigits.value = bookingPin.value.toString().split("");
+        console.log(pinDigits);
         console.log('Device rented successfully:', item);
         isPinDisplayVisible.value = true;
         await loadDevices();
@@ -168,8 +180,30 @@ export default defineComponent({
       isConfirmationVisible,
       bookingPin,
       isPinDisplayVisible,
-      mapImage
+      mapImage,
+      pinDigits,
     };
   },
 });
 </script>
+<style>
+.pin-container {
+  display: flex;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.pin-digit {
+  margin: 0 10px;
+  text-align: center;
+  font-size: 36px; /* Increase font size */
+  color: #333; /* Adjust color as needed */
+  border: 1px solid #333; /* Add thin border around each digit */
+  border-radius: 5px; /* Add rounded corners for a softer look */
+  width: 60px; /* Set width to create equal-sized boxes */
+  height: 60px; /* Set height to create equal-sized boxes */
+  line-height: 60px; /* Vertically center the digit */
+}
+
+/* You can add more styling or animations as needed */
+</style>
