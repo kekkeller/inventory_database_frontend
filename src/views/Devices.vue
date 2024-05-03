@@ -1,15 +1,13 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
-    <div>
+    <div class="d-flex justify-content-between mb-3">
       <h3 class="text-left">Devices</h3>
-      <div class="d-flex justify-content-end mb-3">
         <b-button variant="success" @click="openAddDeviceModal">
           <div class="d-flex align-items-center justify-content-center">
             <BIconPlusCircle></BIconPlusCircle>
             <span class="ml-2">Add New Device</span>
-          </div>
-        </b-button>
-      </div>
+          </div></b-button>
+        </div>
       <b-table striped hover :items="devices" :fields="fields" class="w-full">
         <template #cell(edit)="data">
           <b-button variant="primary" @click="editDevice(data.item)">
@@ -122,8 +120,6 @@
         Are you sure you want to delete this device?
       </b-modal>
     </div>
-
-  </div>
 </template>
 
 
