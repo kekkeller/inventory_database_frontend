@@ -2,14 +2,28 @@
   <div class="mx-auto my-10" style="width: 90%;">
     <div class="d-flex justify-content-between mb-3">
       <h3 class="text-left">Categories</h3>
-      <b-button @click="showCreateModal" variant="success">Create New Category</b-button>
+      <b-button @click="showCreateModal" variant="success">
+        <div class="d-flex align-items-center justify-content-center">
+          <BIconPlusCircle></BIconPlusCircle>
+          <span class="ml-2">Create New Category</span>
+        </div></b-button>
     </div>
     <b-table striped hover :items="categories" :fields="fields" class="w-full">
       <template #cell(edit)="data">
-        <b-button variant="primary" @click="editCategory(data.item)">Edit</b-button>
+        <b-button variant="primary" @click="editCategory(data.item)">
+          <div class="d-flex align-items-center justify-content-center">
+            <BIconPencilFill></BIconPencilFill>
+            <span class="ml-2">Edit</span>
+          </div>
+        </b-button>
       </template>
       <template #cell(delete)="data">
-        <b-button variant="danger" @click="confirmDelete(data.item.id)">Delete</b-button>
+        <b-button variant="danger" @click="confirmDelete(data.item.id)">
+          <div class="d-flex align-items-center justify-content-center">
+            <BIconXCircle></BIconXCircle>
+            <span class="ml-2">Delete</span>
+          </div>
+          </b-button>
       </template>
     </b-table>
 

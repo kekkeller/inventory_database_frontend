@@ -3,14 +3,31 @@
     <div>
       <h3 class="text-left">Devices</h3>
       <div class="d-flex justify-content-end mb-3">
-        <b-button variant="success" @click="openAddDeviceModal">Add New Device</b-button>
+        <b-button variant="success" @click="openAddDeviceModal">
+          <div class="d-flex align-items-center justify-content-center">
+            <BIconPlusCircle></BIconPlusCircle>
+            <span class="ml-2">Add New Device</span>
+          </div>
+        </b-button>
       </div>
       <b-table striped hover :items="devices" :fields="fields" class="w-full">
         <template #cell(edit)="data">
-          <b-button variant="primary" @click="editDevice(data.item)">Edit</b-button>
+          <b-button variant="primary" @click="editDevice(data.item)">
+            <div class="d-flex align-items-center justify-content-center">
+              <BIconPencilFill></BIconPencilFill>
+              <span class="ml-2">Edit</span>
+            </div>
+          </b-button>
+
+
         </template>
         <template #cell(delete)="data">
-          <b-button variant="danger" @click="confirmDelete(data.item.id)">Delete</b-button>
+          <b-button variant="danger" @click="confirmDelete(data.item.id)">
+            <div class="d-flex align-items-center justify-content-center">
+              <BIconXCircle></BIconXCircle>
+              <span class="ml-2">Delete</span>
+            </div>
+          </b-button>
         </template>
       </b-table>
 
@@ -173,7 +190,7 @@ export default defineComponent({
     const loadDevices = async () => {
       try {
         const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/devices');
-        devices.value = response.data.map((device: Device) => ({
+        devices.value = response.data.filter((device: Device) => device.brand != 'Locker').map((device: Device) => ({
           ...device,
           category_id: getCategoryName(device.category_id)
         }));
@@ -269,7 +286,7 @@ export default defineComponent({
       { key: 'brand', label: 'Brand' },
       { key: 'model', label: 'Model' },
       { key: 'serial_no', label: 'Serial Number' },
-      { key: 'qr_code', label: 'QR Code' },
+      // { key: 'qr_code', label: 'QR Code' },
       { key: 'category_id', label: 'Category' },
       { key: 'edit', label: 'Edit', sortable: false },
       { key: 'delete', label: 'Delete', sortable: false }

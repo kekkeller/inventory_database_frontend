@@ -7,6 +7,9 @@
         <span v-if="data.item.active">--</span>
         <span v-else>{{ (data.item.time_end) }}</span>
       </template>
+      <template #cell(booking_price)="data">
+        {{ data.item.booking_price }} €
+      </template>
     </b-table>
   </div>
 </template>
