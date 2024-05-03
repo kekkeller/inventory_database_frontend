@@ -1,6 +1,6 @@
 <template>
   <div class="mx-auto my-10" style="width: 90%;">
-    <h3 class="text-left">Renting Device</h3>
+    <h3 class="text-left">My Bookings</h3>
     <b-table striped hover :items="bookings" :fields="fields" class="w-full">
       <template #cell(actions)="{ item }">
         <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">

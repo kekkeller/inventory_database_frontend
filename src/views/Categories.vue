@@ -60,7 +60,7 @@ export default defineComponent({
 
     const loadCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get('https://f-itplfo6nya-uc.a.run.app/categories');
         categories.value = response.data;
       } catch (error) {
         console.error("Failed to fetch categories:", error);

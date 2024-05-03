@@ -56,6 +56,11 @@
         </div>
 
         <div class="form-group">
+          <label for="model">Image:</label>
+          <b-form-input id="model" v-model="newDevice.image" required></b-form-input>
+        </div>
+
+        <div class="form-group">
           <label for="serial_no">Serial Number:</label>
           <b-form-input id="serial_no" v-model="newDevice.serial_no" required></b-form-input>
         </div>
