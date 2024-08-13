@@ -9,11 +9,13 @@
       </template>
     </b-table>
   </div>
+  <Footer_component></footer_component>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
+import Footer_component from "@/components/footer_component.vue";
 
 interface Rental {
   id: number;
@@ -27,7 +29,7 @@ interface Rental {
 }
 
 export default defineComponent({
-  components: { },
+  components: {Footer_component},
   setup() {
     const rentals = ref<Rental[]>([]);
     const fields = [

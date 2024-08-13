@@ -1,183 +1,121 @@
 <template>
-  <div class="mx-auto my-10" style="width: 90%;">
-    <h3 class="text-left">Renting Device</h3>
-    <b-table striped hover :items="bookings" :fields="fields" class="w-full">
-      <template #cell(actions)="{ item }">
-        <b-button variant="secondary" v-if="!item.active" @click="showDetails(item)">
-          <div class="d-flex align-items-center justify-content-center buttonsize">
-            <BIconInfoCircle></BIconInfoCircle>
-            <span class="ml-2">Details</span>
-          </div>
-        </b-button>
-        <b-button variant="danger" v-if="item.active" @click="showCloseBookingModal(item)">
-          <div class="d-flex align-items-center justify-content-center buttonsize">
-            <BIconXCircle></BIconXCircle>
-            <span class="ml-2">Close Booking</span>
-          </div>
-        </b-button>
-      </template>
-      <template #cell(charge)="{ item }">
-        <b-button variant="warning" v-if="item.active && item.rent_charge === 'charge'" @click="showVoltageModal">
-          <div class="d-flex align-items-center justify-content-center">
-            <BIconLightning></BIconLightning>
-            <span class="ml-2">Charging Info</span>
-          </div>
-        </b-button>
-      </template>
-      <template #cell(time_start)="data">
-        {{ formatDateTime(data.item.time_start) }}
-      </template>
-      <template #cell(time_end)="data">
-        <!-- Bedingte Anzeige für Endzeit -->
-        <span v-if="data.item.active">--</span>
-        <span v-else>{{ formatDateTime(data.item.time_end) }}</span>
-      </template>
-      <template #cell(device_id)="data">
-        {{ deviceMap[data.item.device_id] }}
-      </template>
-      <template #cell(booking_price)="data">
-        {{ data.item.booking_price }} €
-      </template>
-    </b-table>
-
-    <b-modal id="details-modal" v-model="isModalVisible" title="Booking Details" ok-only ok-title="Close">
-      <template v-if="selectedItem">
-        <p><strong>Start Time:</strong> {{ formatDateTime(selectedItem.time_start) }}</p>
-        <p><strong>End Time:</strong> {{ formatDateTime(selectedItem.time_end) }}</p>
-        <p><strong>Price:</strong> {{ selectedItem.booking_price }}</p>
-        <p><strong>Device Model:</strong> {{ deviceMap[selectedItem.device_id] }}</p>
-        <p><strong>Active:</strong> {{ selectedItem.active }}</p>
-        <p><strong>Rent Charge:</strong> {{ selectedItem.rent_charge }}</p>
-        <p><strong>PIN:</strong> {{ selectedItem.pin }}</p>
-      </template>
-    </b-modal>
-
-    <b-modal id="close-booking-modal" v-model="isCloseBookingModalVisible" title="Confirm Closure" @ok="closeBooking">
-      Are you sure you want to close this booking?
-    </b-modal>
-
-    <b-modal id="voltage-modal" v-model="isVoltageModalVisible" title="Voltage Information" size="lg" ok-only ok-title="Close">
-      <div class="d-flex justify-content-center align-items-center pt-10">
-        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2530450/widgets/852176"></iframe>
-        <iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/2530450/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&title=History+of+Wattage&type=line"></iframe>
+  <div>
+    <h1>Willkommen Philipp</h1>
+    <div class="w-auto w-75">
+      <div>
+        <label v-for="(ticker, index) in selectedStocks" :key="index">
+          Stock {{ index + 1 }}:
+          <input v-model="selectedStocks[index]" placeholder="Enter Stock Ticker (e.g., AAPL)" />
+        </label>
       </div>
-    </b-modal>
+      <button @click="fetchStockData">Fetch Data</button>
+      <apexchart type="line" :options="chartOptions" :series="series"></apexchart>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
-
-interface Booking {
-  time_start: string;
-  time_end: string;
-  active: boolean;
-  booking_price: number;
-  device_id: number;
-  user_id: number;
-  rent_charge: string;
-  pin: number;
-  id: number;
-}
-
-interface Device {
-  id: number;
-  model: string;
-  rent_price_per_hour: number;
-}
+import ApexCharts from 'vue3-apexcharts';
 
 export default defineComponent({
+  components: {
+    apexchart: ApexCharts,
+  },
   setup() {
-    const bookings = ref<Booking[]>([]);
-    const isModalVisible = ref(false);
-    const isVoltageModalVisible = ref(false);
-    const selectedItem = ref<Booking | null>(null);
-    const isCloseBookingModalVisible = ref(false);
-    const deviceMap = ref<Record<number, string>>({});
+    const selectedStocks = ref(['AAPL', '', '', '', '']); // Initialize with one stock and placeholders for four more
 
-    const fields = [
-      { key: 'time_start', label: 'Start Time' },
-      { key: 'time_end', label: 'End Time' },
-      { key: 'device_id', label: 'Device Model' },
-      { key: 'booking_price', label: 'Booking Price'  },
-      { key: 'charge', label: '', sortable: false },
-      { key: 'actions', label: 'Actions', sortable: false }
-    ];
+    const series = ref([
+      {
+        name: '',
+        data: [],
+      },
+    ]);
 
-    const fetchBookings = async () => {
+    const chartOptions = ref({
+      chart: {
+        type: 'line',
+        height: 350,
+      },
+      title: {
+        text: 'Stock Prices Over the Last 3 Months',
+      },
+      xaxis: {
+        categories: [],
+      },
+    });
+
+    const apiKey = 'qLKH4ya_B_ub1xNT5Xwp_B4NoUPU0Pgi';
+
+    const fetchStockData = async () => {
       try {
-        const userId = Number(sessionStorage.getItem('userId'));
-        const response = await axios.get(`/api/bookings/allbyUserID/${userId}`);
-        bookings.value = response.data;
-        const deviceIds = bookings.value.map(booking => booking.device_id);
-        await fetchDeviceDetails(deviceIds);
-      } catch (error) {
-        console.error('Failed to fetch bookings:', error);
-      }
-    };
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 3);
+        const formattedStartDate = startDate.toISOString().split('T')[0];
+        const formattedEndDate = new Date().toISOString().split('T')[0];
 
-    const fetchDeviceDetails = async (deviceIds: number[]) => {
-      const response = await axios.get(`/api/devices?ids=${deviceIds.join(',')}`);
-      response.data.forEach((device: Device) => {
-        deviceMap.value[device.id] = device.model;
-      });
-    };
+        const promises = selectedStocks.value
+            .filter((ticker) => ticker !== '')
+            .map(async (stockTicker) => {
+              const response = await axios.get(
+                  `https://api.polygon.io/v2/aggs/ticker/${stockTicker}/range/1/day/${formattedStartDate}/${formattedEndDate}`,
+                  {
+                    params: {
+                      apiKey: apiKey,
+                    },
+                  }
+              );
+              return {
+                name: stockTicker,
+                data: response.data.results.map((entry: any) => entry.c),
+                categories: response.data.results.map((entry: any) =>
+                    new Date(entry.t).toLocaleDateString()
+                ),
+              };
+            });
 
-    const showDetails = (item: Booking) => {
-      selectedItem.value = item;
-      isModalVisible.value = true;
-    };
+        const results = await Promise.all(promises);
 
-    const showCloseBookingModal = (item: Booking) => {
-      selectedItem.value = item;
-      isCloseBookingModalVisible.value = true;
-    };
+        series.value = results.map((result) => ({
+          name: result.name,
+          data: result.data,
+        }));
 
-    const showVoltageModal = () => {
-      isVoltageModalVisible.value = true;
-    };
-
-    const closeBooking = async () => {
-      try {
-        if (selectedItem.value) {
-          const updatedBooking = { ...selectedItem.value, active: false, time_end: new Date().toISOString() };
-          await axios.put(`/api/bookings/${selectedItem.value.id}`, updatedBooking);
-          isCloseBookingModalVisible.value = false;
-          await fetchBookings();
+        if (results.length > 0) {
+          chartOptions.value.xaxis.categories = results[0].categories;
         }
       } catch (error) {
-        console.error('Failed to close booking:', error);
+        console.error('Error fetching stock data:', error);
       }
     };
 
-    const formatDateTime = (dateTime: string) => {
-      const date = new Date(dateTime);
-      return date.toLocaleString();
-    };
-
-    onMounted(fetchBookings);
+    onMounted(() => {
+      fetchStockData();
+    });
 
     return {
-      bookings,
-      fields,
-      showDetails,
-      isModalVisible,
-      selectedItem,
-      formatDateTime,
-      isCloseBookingModalVisible,
-      showCloseBookingModal,
-      closeBooking,
-      deviceMap,
-      isVoltageModalVisible,
-      showVoltageModal
+      selectedStocks,
+      series,
+      chartOptions,
+      fetchStockData,
     };
-  }
+  },
 });
 </script>
+
 <style scoped>
-.buttonsize{
+.buttonsize {
   width: 10rem;
 }
-</style>
 
+label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+input {
+  margin-left: 0.5rem;
+  padding: 0.25rem;
+}
+</style>

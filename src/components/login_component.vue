@@ -4,74 +4,66 @@
     <h1 class="pt-5">
       Welcome to the Inventory Management Database!
     </h1>
-
   </div>
-    <div class="login-container p-4 shadow rounded bg-light" style="max-width: 400px; margin: 50px auto;">
-      <h2 class="text-center mb-4">Login</h2>
-      <form @submit.prevent="login" class="needs-validation" novalidate>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email:</label>
-          <input type="email" id="email" class="form-control" v-model="credentials.email" required>
-          <div class="invalid-feedback">
-            Please provide a valid email.
-          </div>
+  <div class="login-container p-4 shadow rounded bg-light" style="max-width: 400px; margin: 50px auto;">
+    <h2 class="text-center mb-4">Login</h2>
+    <form @submit.prevent="login" class="needs-validation" novalidate>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" id="email" class="form-control" v-model="credentials.email" required>
+        <div class="invalid-feedback">
+          Please provide a valid email.
         </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Password:</label>
-          <input type="password" id="password" class="form-control" v-model="credentials.password" required>
-          <div class="invalid-feedback">
-            Password is required.
-          </div>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" id="password" class="form-control" v-model="credentials.password" required>
+        <div class="invalid-feedback">
+          Password is required.
         </div>
-        <p v-if="errorMessage" class="error-message text-danger">{{ errorMessage }}</p>
-        <div class="d-grid gap-2">
-          <b-button type="submit" variant="success" class="btn-block">Login</b-button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <p v-if="errorMessage" class="error-message text-danger">{{ errorMessage }}</p>
+      <div class="d-grid gap-2">
+        <b-button type="submit" variant="success" class="btn-block">Login</b-button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
-import {useLoggedIn} from "../composable/useLoggedIn";
+import { useLoggedIn } from "../composable/useLoggedIn";
 
 export default defineComponent({
   name: 'LoginComponent',
-  components: { },
   setup() {
     const router = useRouter();
     const logoImageUrl = new URL('../assets/logo.png', import.meta.url).href;
     const credentials = ref({ email: '', password: '' });
     const errorMessage = ref('');
-    const {setLoggedIn} = useLoggedIn();
+    const { setLoggedIn } = useLoggedIn();
 
     const login = async () => {
       errorMessage.value = '';
-      try {
-        // Verwende URLSearchParams, um die Parameter sicher zu kodieren
-        const params = new URLSearchParams();
-        params.append('email', credentials.value.email);
-        params.append('password', credentials.value.password);
 
-        const response = await axios.post('/api/loginIsValid?' + params.toString());
+      // Mocked login logic for admin and user
+      const adminCredentials = { email: 'admin', password: 'admin' };
+      const userCredentials = { email: 'user', password: 'user' };
 
-        // Hier folgt die Logik basierend auf der Antwort
-        if (response.data && response.data.role) {
-          const role = response.data.role === 'admin' ? 'Admin' : 'User';
-          console.log(response.data);
-          sessionStorage.setItem('userId', response.data.id);
-          sessionStorage.setItem('isAuthenticated', 'true');
-          sessionStorage.setItem('isAdmin', role === 'Admin' ? 'true' : 'false');
-          setLoggedIn(role);
-          const destinationRoute = role === 'Admin' ? '/adminDashboard' : '/';
-          await router.push(destinationRoute);
-        } else {
-          errorMessage.value = 'Login failed. Please check your credentials.';
-        }
-      } catch (error) {
-        console.error('Login request failed:', error);
+      if (credentials.value.email === adminCredentials.email && credentials.value.password === adminCredentials.password) {
+        sessionStorage.setItem('userId', '1');
+        sessionStorage.setItem('isAuthenticated', 'true');
+        sessionStorage.setItem('isAdmin', 'true');
+        setLoggedIn('Admin');
+        await router.push('/adminDashboard');
+      } else if (credentials.value.email === userCredentials.email && credentials.value.password === userCredentials.password) {
+        sessionStorage.setItem('userId', '2');
+        sessionStorage.setItem('isAuthenticated', 'true');
+        sessionStorage.setItem('isAdmin', 'false');
+        setLoggedIn('User');
+        await router.push('/');
+      } else {
         errorMessage.value = 'Login failed. Please check your credentials.';
       }
     };
@@ -97,11 +89,11 @@ export default defineComponent({
   }
   50% {
     transform: scale(1.3);
-  }
+  } /* Hier fehlt eine schließende Klammer */
   100% {
     transform: scale(1);
   }
-}
+} /* Hier schließen wir den @keyframes-Block */
 .login-container {
   max-width: 600px;
   margin: auto;
@@ -114,6 +106,7 @@ export default defineComponent({
   margin-top: -10px;
   margin-bottom: 10px;
 }
+
 .login-container form input {
   width: 100%;
   padding: 8px;
@@ -121,12 +114,12 @@ export default defineComponent({
   border-radius: 10px;
 }
 
- .login-container {
-   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.2);
-   background-color: #fff;
-   padding: 2rem;
-   border-radius: 0.5rem;
- }
+.login-container {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
 
 .error-message {
   color: #dc3545; /* Bootstrap danger color */
@@ -154,5 +147,5 @@ input[type="password"]:focus {
   padding: 0.75rem;
   font-size: 1.2rem;
 }
-</style>
 
+</style>

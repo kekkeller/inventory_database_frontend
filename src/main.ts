@@ -4,6 +4,7 @@ import router from './router'
 import { createPinia } from 'pinia'
 import  BootstrapVue3  from 'bootstrap-vue-3';
 import { BootstrapIconsPlugin } from "bootstrap-icons-vue";
+import VueApexCharts from "vue3-apexcharts";
 
 import './css/index.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -16,5 +17,6 @@ app.config.globalProperties.backendLink = 'https://f-itplfo6nya-uc.a.run.app'
 app.use(BootstrapVue3)
 app.use(BootstrapIconsPlugin);
 app.use(router)
+app.use(VueApexCharts)
 app.use(createPinia())
 app.mount('#app')

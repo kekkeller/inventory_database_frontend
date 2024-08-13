@@ -14,21 +14,21 @@
                 aria-current="page"
                 active-class="active-tab"
             >Home</router-link>
-            <router-link
-                :to="{ name: 'Renting Device' }"
-                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                active-class="active-tab"
-            >Rent Device</router-link>
-            <router-link
-                :to="{ name: 'Renting Locker' }"
-                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                active-class="active-tab"
-            >Rent Locker</router-link>
-            <router-link
-                :to="{ name: 'Report a Problem' }"
-                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                active-class="active-tab"
-            >Report a Problem</router-link>
+<!--            <router-link-->
+<!--                :to="{ name: 'Renting Device' }"-->
+<!--                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"-->
+<!--                active-class="active-tab"-->
+<!--            >Rent Device</router-link>-->
+<!--            <router-link-->
+<!--                :to="{ name: 'Renting Locker' }"-->
+<!--                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"-->
+<!--                active-class="active-tab"-->
+<!--            >Rent Locker</router-link>-->
+<!--            <router-link-->
+<!--                :to="{ name: 'Report a Problem' }"-->
+<!--                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"-->
+<!--                active-class="active-tab"-->
+<!--            >Report a Problem</router-link>-->
           </div>
         </div>
         <div class="flex items-center">
