@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Willkommen Philipp</h1>
-    <div class="w-auto w-75">
+    <div class="w-full w-75 items-center">
       <div>
         <label v-for="(ticker, index) in selectedStocks" :key="index">
           Stock {{ index + 1 }}:
@@ -24,7 +24,7 @@ export default defineComponent({
     apexchart: ApexCharts,
   },
   setup() {
-    const selectedStocks = ref(['AAPL', '', '', '', '']); // Initialize with one stock and placeholders for four more
+    const selectedStocks = ref(['AAPL', '', '', '', '']);
 
     const series = ref([
       {

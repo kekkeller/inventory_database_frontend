@@ -1,8 +1,8 @@
 <template>
   <div class="d-flex flex-column align-items-center text-center">
-    <img :src="logoImageUrl" alt="Icon" class="h-32 w-auto animate-pulse">
+<!--    <img :src="logoImageUrl" alt="Icon" class="h-32 w-auto animate-pulse">-->
     <h1 class="pt-5">
-      Welcome to the Inventory Management Database!
+      Welcome to TrendView
     </h1>
   </div>
   <div class="login-container p-4 shadow rounded bg-light" style="max-width: 400px; margin: 50px auto;">

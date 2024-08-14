@@ -1,24 +1,23 @@
 <template>
-  <nav class="bg-gray-800">
+  <nav class="bg-cyan-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16">
         <div class="flex">
           <div class="flex-shrink-0 flex items-center">
-            <img :src="logoImageUrl" alt="Icon" class="h-10 w-auto">
-            <a class="text-white text-2xl no-underline">Database Inventory</a>
+<!--            <img :src="logoImageUrl" alt="Icon" class="h-10 w-auto">-->
+            <a class="text-white text-2xl no-underline">TrendView</a>
           </div>
           <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4 pl-5">
-            <router-link
                 :to="{ name: 'Home' }"
                 class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                 aria-current="page"
                 active-class="active-tab"
             >Home</router-link>
-<!--            <router-link-->
-<!--                :to="{ name: 'Renting Device' }"-->
-<!--                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"-->
-<!--                active-class="active-tab"-->
-<!--            >Rent Device</router-link>-->
+            <router-link
+                :to="{ name: 'Portfolio' }"
+                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                active-class="active-tab"
+            >Portfolio</router-link>
 <!--            <router-link-->
 <!--                :to="{ name: 'Renting Locker' }"-->
 <!--                class="no-underline text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"-->

@@ -5,8 +5,8 @@
         <div class="flex">
           <!-- Logo und Titel, ähnlich wie in der Hauptnavbar -->
           <div class="flex-shrink-0 flex items-center">
-            <img :src="logoImageUrl" alt="Icon" class="h-10 w-auto">
-            <a class="text-white text-2xl no-underline">Admin Panel - Database Inventory</a>
+<!--            <img :src="logoImageUrl" alt="Icon" class="h-10 w-auto">-->
+            <a class="text-white text-2xl no-underline">TrendView</a>
           </div>
           <div class="hidden md:ml-6 md:flex md:items-center md:space-x-4 pl-5">
             <router-link

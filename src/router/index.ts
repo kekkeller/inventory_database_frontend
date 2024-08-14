@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/problemReports', name: 'Problem Reports', component: ProblemReports, meta: { requiresAuth: true, requiresAdmin: true } },
 
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true, requiresAdmin: false } },
-  { path: '/rentingDevice', name: 'Renting Device', component: () => import('../views/renting_devices.vue'), meta: { requiresAuth: true, requiresAdmin: false } },
+  { path: '/portfolio', name: 'Portfolio', component: () => import('../views/portfolio_screen.vue'), meta: { requiresAuth: true, requiresAdmin: false } },
   { path: '/rentingLocker', name: 'Renting Locker', component: () => import('../views/renting_locker.vue'), meta: { requiresAuth: true, requiresAdmin: false } },
   { path: '/reportProblem', name: 'Report a Problem', component: () => import('../views/report_a_problem.vue'), meta: { requiresAuth: true, requiresAdmin: false } },
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue') }
@@ -32,7 +32,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
-  const isAuthenticated = sessionStorage.getItem('isAuthenticated'); // Überprüfe, wie dieser Wert gesetzt wird.
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated');
   const isAdmin = sessionStorage.getItem('isAdmin') === 'true'; // Admin Status
 
   console.log('Auth:', isAuthenticated, 'Admin:', isAdmin); // Logging zur Diagnose
