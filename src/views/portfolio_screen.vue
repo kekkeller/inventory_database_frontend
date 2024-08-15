@@ -86,9 +86,10 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import ApexChart from 'vue3-apexcharts';
 import { BButton, BFormInput } from 'bootstrap-vue-3';
+import axios from 'axios';
 
 export default {
   components: {
@@ -97,6 +98,10 @@ export default {
     BFormInput,
   },
   setup() {
+    const API_KEY = 'cqv4us9r01qkoahf7nfgcqv4us9r01qkoahf7ng0';  // Dein API-Schlüssel
+    const FINNHUB_API_BASE_URL = 'https://finnhub.io/api/v1';
+    const socket = ref(null);
+
     const portfolios = ref([
       {
         name: 'Tech Portfolio',
@@ -213,6 +218,82 @@ export default {
       favorites.value = favorites.value.filter((f) => f.symbol !== stock.symbol);
     };
 
+    // Funktion zum Starten der WebSocket-Verbindung
+    const initializeWebSocket = () => {
+      socket.value = new WebSocket(`wss://ws.finnhub.io?token=${API_KEY}`);
+
+      socket.value.onopen = () => {
+        console.log('WebSocket connection opened');
+        // Alle Symbole abonnieren, die in den Favoriten und Portfolios vorhanden sind
+        [...favorites.value, ...portfolios.value.flatMap(p => p.stocks)].forEach(stock => {
+          socket.value.send(JSON.stringify({ type: 'subscribe', symbol: stock.symbol }));
+        });
+      };
+
+      socket.value.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'trade') {
+          const trade = data.data[0];
+          updateStockPrice(trade.s, trade.p);
+        }
+      };
+
+      socket.value.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+
+      socket.value.onerror = (error) => {
+        console.error('WebSocket error', error);
+      };
+    };
+
+    const updateStockPrice = (symbol, price) => {
+      // Update price in portfolios
+      portfolios.value.forEach((portfolio) => {
+        const stock = portfolio.stocks.find((s) => s.symbol === symbol);
+        if (stock) stock.price = price;
+      });
+
+      // Update price in favorites
+      const favorite = favorites.value.find((f) => f.symbol === symbol);
+      if (favorite) favorite.price = price;
+    };
+
+    // Funktion zum Abrufen des aktuellen Preises für ein bestimmtes Symbol
+    const fetchLatestPrice = async (symbol) => {
+      try {
+        const response = await axios.get(`${FINNHUB_API_BASE_URL}/quote`, {
+          params: {
+            symbol,
+            token: API_KEY,
+          },
+        });
+        const price = response.data.c;  // "c" steht für aktuellen Preis
+        updateStockPrice(symbol, price);
+      } catch (error) {
+        console.error('Error fetching the latest price:', error);
+      }
+    };
+
+    // Funktion zum Abrufen aller aktuellen Preise
+    const fetchAllLatestPrices = () => {
+      // Preise für alle Favoriten abrufen
+      favorites.value.forEach(stock => fetchLatestPrice(stock.symbol));
+      // Preise für alle Portfolios abrufen
+      portfolios.value.flatMap(p => p.stocks).forEach(stock => fetchLatestPrice(stock.symbol));
+    };
+
+    onMounted(() => {
+      initializeWebSocket();
+      fetchAllLatestPrices();  // Preise werden beim Laden der Seite abgerufen
+    });
+
+    onBeforeUnmount(() => {
+      if (socket.value) {
+        socket.value.close();
+      }
+    });
+
     return {
       portfolios,
       favorites,
@@ -225,10 +306,12 @@ export default {
       handleRemovePortfolio,
       handleAddToFavorites,
       handleRemoveFromFavorites,
+      fetchAllLatestPrices,  // Diese Funktion kann nun durch den Button aufgerufen werden
     };
   },
 };
 </script>
+
 
 <style scoped>
 .portfolio-chart {
