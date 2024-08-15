@@ -16,8 +16,10 @@
         </div>
       </div>
     </header>
-    <main class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-      <!-- Favorites Section -->
+
+    <!-- Grid für Favoriten und Aktien Suche -->
+    <main class="flex-1 grid grid-cols-2 gap-6 p-6">
+      <!-- Favoriten Section -->
       <div class="bg-background rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-bold mb-4">Favorites</h2>
         <div class="grid grid-cols-2 gap-4">
@@ -40,7 +42,39 @@
         </div>
       </div>
 
-      <!-- Portfolios Section -->
+      <!-- Aktien Suche Section -->
+      <div class="bg-background rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4">Aktien Suche</h2>
+        <div>
+          <b-form-input
+              v-model="searchQuery"
+              placeholder="Search for stocks..."
+              @input="searchStocks"
+          />
+        </div>
+        <div v-if="searchResults.length > 0" class="mt-4">
+          <ul>
+            <li v-for="result in searchResults" :key="result.symbol" class="mb-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-bold">{{ result.symbol }}</div>
+                  <div class="text-muted-foreground">${{ result.price.toFixed(2) }}</div>
+                </div>
+                <b-button
+                    @click="handleAddToFavorites(result)"
+                    variant="outline-primary"
+                >
+                  Add to Favorites
+                </b-button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <!-- Grid für die Portfolios -->
+    <main class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
       <div
           v-for="portfolio in portfolios"
           :key="portfolio.name"
@@ -135,6 +169,9 @@ export default {
       { symbol: 'AMZN', price: 177.68 },
       { symbol: 'NVDA', price: 560.23 },
     ]);
+
+    const searchQuery = ref('');
+    const searchResults = ref([]);
 
     const chartOptions = ref({
       chart: {
@@ -283,6 +320,41 @@ export default {
       portfolios.value.flatMap(p => p.stocks).forEach(stock => fetchLatestPrice(stock.symbol));
     };
 
+    // Funktion zum Suchen nach Aktien
+    const searchStocks = async () => {
+      if (!searchQuery.value) {
+        searchResults.value = [];
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${FINNHUB_API_BASE_URL}/search`, {
+          params: {
+            q: searchQuery.value,
+            token: API_KEY,
+          },
+        });
+
+        const symbols = response.data.result.map((item) => item.symbol);
+        const priceRequests = symbols.map((symbol) =>
+            axios.get(`${FINNHUB_API_BASE_URL}/quote`, {
+              params: {
+                symbol,
+                token: API_KEY,
+              },
+            })
+        );
+
+        const prices = await Promise.all(priceRequests);
+        searchResults.value = symbols.map((symbol, index) => ({
+          symbol,
+          price: prices[index].data.c, // Aktueller Preis
+        }));
+      } catch (error) {
+        console.error('Error searching for stocks:', error);
+      }
+    };
+
     onMounted(() => {
       initializeWebSocket();
       fetchAllLatestPrices();  // Preise werden beim Laden der Seite abgerufen
@@ -297,6 +369,8 @@ export default {
     return {
       portfolios,
       favorites,
+      searchQuery,
+      searchResults,
       chartOptions,
       getSeries,
       newPortfolio,
@@ -306,12 +380,12 @@ export default {
       handleRemovePortfolio,
       handleAddToFavorites,
       handleRemoveFromFavorites,
-      fetchAllLatestPrices,  // Diese Funktion kann nun durch den Button aufgerufen werden
+      fetchAllLatestPrices,
+      searchStocks,
     };
   },
 };
 </script>
-
 
 <style scoped>
 .portfolio-chart {
