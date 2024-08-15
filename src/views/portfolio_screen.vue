@@ -17,6 +17,7 @@
       </div>
     </header>
     <main class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+      <!-- Favorites Section -->
       <div class="bg-background rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-bold mb-4">Favorites</h2>
         <div class="grid grid-cols-2 gap-4">
@@ -30,7 +31,7 @@
             <div class="mt-4 flex justify-end">
               <b-button
                   @click="handleAddToPortfolio(stock)"
-                  class="button outline sm"
+                  variant="outline-primary"
               >
                 Add to Portfolio
               </b-button>
@@ -38,6 +39,8 @@
           </div>
         </div>
       </div>
+
+      <!-- Portfolios Section -->
       <div
           v-for="portfolio in portfolios"
           :key="portfolio.name"
@@ -45,14 +48,11 @@
       >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-bold">{{ portfolio.name }}</h2>
-          <button
-              @click="handleRemovePortfolio(portfolio)"
-              class="button ghost icon"
-          >
+          <b-button @click="handleRemovePortfolio(portfolio)" variant="ghost" class="icon">
             <BIconXCircle></BIconXCircle>
-          </button>
+          </b-button>
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4 mb-4">
           <div
               v-for="stock in portfolio.stocks"
               :key="stock.symbol"
@@ -65,7 +65,8 @@
               </div>
               <b-button
                   @click="handleRemoveFromPortfolio(portfolio, stock)"
-                  class="button ghost icon"
+                  variant="danger"
+                  class="icon"
               >
                 <BIconDashCircle></BIconDashCircle>
               </b-button>
@@ -84,174 +85,122 @@
   </div>
 </template>
 
-
 <script>
-import { ref } from "vue";
-import ApexChart from "vue3-apexcharts";
-import dayjs from "dayjs";
-
-const XIcon = {
-  template: `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
-      <line x1="18" y1="6" x2="6" y2="18"></line>
-      <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  `,
-};
+import { ref } from 'vue';
+import ApexChart from 'vue3-apexcharts';
+import { BButton, BFormInput } from 'bootstrap-vue-3';
 
 export default {
   components: {
     ApexChart,
-    XIcon,
+    BButton,
+    BFormInput,
   },
   setup() {
     const portfolios = ref([
       {
-        name: "Tech Portfolio",
+        name: 'Tech Portfolio',
         stocks: [
-          { symbol: "AAPL", price: 120.45 },
-          { symbol: "MSFT", price: 250.12 },
-          { symbol: "AMZN", price: 3120.78 },
+          { symbol: 'AAPL', price: 224.99 },
+          { symbol: 'MSFT', price: 420.08 },
+          { symbol: 'AMZN', price: 177.68 },
         ],
       },
       {
-        name: "Growth Portfolio",
+        name: 'Growth Portfolio',
         stocks: [
-          { symbol: "NVDA", price: 560.23 },
-          { symbol: "TSLA", price: 650.45 },
-          { symbol: "SHOP", price: 1120.12 },
+          { symbol: 'NVDA', price: 560.23 },
+          { symbol: 'TSLA', price: 650.45 },
+          { symbol: 'SHOP', price: 1120.12 },
         ],
       },
       {
-        name: "Dividend Portfolio",
+        name: 'Dividend Portfolio',
         stocks: [
-          {symbol: "JNJ", price: 165.78},
-          {symbol: "PG", price: 132.45},
-          {symbol: "KO", price: 54.12},
+          { symbol: 'JNJ', price: 165.78 },
+          { symbol: 'PG', price: 132.45 },
+          { symbol: 'KO', price: 54.12 },
         ],
       },
     ]);
 
     const favorites = ref([
-      {symbol: "AAPL", price: 120.45},
-      {symbol: "MSFT", price: 250.12},
-      {symbol: "AMZN", price: 3120.78},
-      {symbol: "NVDA", price: 560.23},
+      { symbol: 'AAPL', price: 224.99 },
+      { symbol: 'MSFT', price: 420.08 },
+      { symbol: 'AMZN', price: 177.68 },
+      { symbol: 'NVDA', price: 560.23 },
     ]);
-
-    const newPortfolio = ref({
-      name: "",
-      stocks: [],
-    });
 
     const chartOptions = ref({
       chart: {
         type: 'line',
-        height: '80%', // Chart nimmt 80% der Kachel ein
-      },
-      xaxis: {
-        categories: [
-          dayjs().subtract(3, 'week').format('DD MMM'),
-          dayjs().subtract(2, 'week').format('DD MMM'),
-          dayjs().subtract(1, 'week').format('DD MMM'),
-          dayjs().format('DD MMM')
-        ],
+        height: '100%', // Chart füllt die gesamte Höhe der Kachel aus
+        toolbar: {
+          show: false, // Toolbar entfernen, um Platz zu sparen
+        },
       },
       stroke: {
         curve: 'smooth',
       },
+      xaxis: {
+        type: 'datetime',
+      },
+      yaxis: {
+        labels: {
+          formatter: (value) => value.toFixed(2), // Auf 2 Dezimalstellen runden
+        },
+      },
       markers: {
-        size: 5, // Punktgröße
+        size: 4, // Größe der Punkte auf dem Chart
       },
       dataLabels: {
         enabled: false,
       },
       tooltip: {
-        x: {
-          format: 'DD MMM', // Tooltip-Datumformat
+        y: {
+          formatter: (value) => `$${value.toFixed(2)}`, // Tooltip mit 2 Dezimalstellen
         },
       },
     });
 
-    const realTimeData = ref({});
-
-    const socket = new WebSocket('wss://ws.finnhub.io?token=cqv4us9r01qkoahf7nfgcqv4us9r01qkoahf7ng0');
-
-    socket.addEventListener('open', () => {
-      // Abonnieren von Aktien
-      portfolios.value.forEach(portfolio => {
-        portfolio.stocks.forEach(stock => {
-          socket.send(JSON.stringify({'type': 'subscribe', 'symbol': stock.symbol}));
-        });
-      });
-    });
-
-    socket.addEventListener('message', event => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'trade') {
-        const stockData = data.data[0];
-        realTimeData.value[stockData.s] = stockData.p;
-
-        // Aktualisiere den Aktienkurs in Portfolios und Favoriten
-        updateStockPrice(stockData.s, stockData.p);
-      }
-    });
-
-    const updateStockPrice = (symbol, price) => {
-      // Aktualisiere den Preis in Portfolios
-      portfolios.value.forEach(portfolio => {
-        const stock = portfolio.stocks.find(s => s.symbol === symbol);
-        if (stock) stock.price = price;
-      });
-
-      // Aktualisiere den Preis in Favoriten
-      const favorite = favorites.value.find(f => f.symbol === symbol);
-      if (favorite) favorite.price = price;
-    };
-
     const getSeries = (portfolio) => {
-      return portfolio.stocks.map(stock => ({
+      return portfolio.stocks.map((stock) => ({
         name: stock.symbol,
         data: [
-          stock.price, // Preis der letzten 4 Wochen (Mock-Daten)
-          stock.price + 5, // Anpassung für die Visualisierung
-          stock.price - 10,
-          stock.price + 3
+          // Beispiel-Daten: Ersetzen durch echte Daten
+          { x: new Date().setDate(new Date().getDate() - 7), y: stock.price },
+          { x: new Date().setDate(new Date().getDate() - 3), y: stock.price + 20 },
+          { x: new Date(), y: stock.price + 10 },
         ],
       }));
     };
 
+    const newPortfolio = ref({
+      name: '',
+      stocks: [],
+    });
+
     const handleAddPortfolio = () => {
-      if (newPortfolio.value.name.trim() !== "") {
-        portfolios.value.push({...newPortfolio.value});
-        newPortfolio.value.name = "";
+      if (newPortfolio.value.name.trim() !== '') {
+        portfolios.value.push({ ...newPortfolio.value });
+        newPortfolio.value.name = '';
         newPortfolio.value.stocks = [];
       }
     };
 
     const handleAddToPortfolio = (stock) => {
-      const portfolio = portfolios.value.find(
-          (p) => p.name === newPortfolio.value.name
-      );
+      const portfolio = portfolios.value.find((p) => p.name === newPortfolio.value.name);
       if (portfolio) {
         portfolio.stocks.push(stock);
       }
     };
 
     const handleRemoveFromPortfolio = (portfolio, stock) => {
-      const updatedPortfolio = {
-        ...portfolio,
-        stocks: portfolio.stocks.filter((s) => s.symbol !== stock.symbol),
-      };
-      portfolios.value = portfolios.value.map((p) =>
-          p.name === portfolio.name ? updatedPortfolio : p
-      );
+      portfolio.stocks = portfolio.stocks.filter((s) => s.symbol !== stock.symbol);
     };
 
     const handleRemovePortfolio = (portfolio) => {
-      portfolios.value = portfolios.value.filter(
-          (p) => p.name !== portfolio.name
-      );
+      portfolios.value = portfolios.value.filter((p) => p.name !== portfolio.name);
     };
 
     const handleAddToFavorites = (stock) => {
@@ -261,17 +210,15 @@ export default {
     };
 
     const handleRemoveFromFavorites = (stock) => {
-      favorites.value = favorites.value.filter(
-          (f) => f.symbol !== stock.symbol
-      );
+      favorites.value = favorites.value.filter((f) => f.symbol !== stock.symbol);
     };
 
     return {
       portfolios,
       favorites,
-      newPortfolio,
       chartOptions,
       getSeries,
+      newPortfolio,
       handleAddPortfolio,
       handleAddToPortfolio,
       handleRemoveFromPortfolio,
@@ -285,15 +232,21 @@ export default {
 
 <style scoped>
 .portfolio-chart {
-  overflow: hidden;
-  border: 1px solid #ddd; /* Grenze für klare Unterscheidung */
-  border-radius: 8px;
-  padding: 16px;
-  background-color: #f9f9f9;
+  height: 100%; /* Kachel füllt den gesamten verfügbaren Platz aus */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Inhalte gleichmäßig verteilen */
 }
 
 .chart-container {
-  height: 70%;
-  width: 100%;
+  height: 100%; /* Chart füllt die gesamte Kachel aus */
+  margin-top: auto; /* Chart bleibt unten in der Kachel */
+}
+
+.card {
+  height: 100%; /* Sicherstellen, dass die Karten gleichmäßig verteilt sind */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 </style>
