@@ -167,7 +167,7 @@ export default {
       { symbol: 'AAPL', price: 224.99 },
       { symbol: 'MSFT', price: 420.08 },
       { symbol: 'AMZN', price: 177.68 },
-      { symbol: 'NVDA', price: 560.23 },
+      { symbol: 'RLEA', price: 100.23 },
     ]);
 
     const searchQuery = ref('');
